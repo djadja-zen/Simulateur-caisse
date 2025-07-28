@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caisse Entraînement - Magasin Immersif</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base & Immersive Layout --- */
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #fff;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-image: url('images/background.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        h2, h3 {
+            text-shadow: 0px 1px 4px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        h2 { font-size: 1.4em; color: #fff; }
+        h3 { font-size: 1.2em; color: #f0f0f0; }
+
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            margin: 4px;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #message-area {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 25px;
+            border-radius: 8px;
+            z-index: 2000;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+        #message-area.message-success { background-color: #28a745; }
+        #message-area.message-error { background-color: #dc3545; }
+        #message-area.message-info { background-color: #17a2b8; }
+        
+        #game-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #customer-and-info-column {
+            flex: 1 1 35%;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-width: 300px;
+        }
+
+        #customer-display-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #customer-image {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 100%;
+            width: auto;
+            max-width: none;
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+            filter: drop-shadow(0px 5px 20px rgba(0, 0, 0, 0.5));
+            object-fit: contain;
+            object-position: bottom center;
+        }
+        
+        section {
+            background: transparent;
+            backdrop-filter: none;
+            box-shadow: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .content-box {
+            background-color: rgba(10, 20, 30, 0.6);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid #ffffff33;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        
+        #right-column {
+            flex: 1 1 65%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #client-info {
+            text-align: center;
+            padding: 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: #fff;
+        }
+        #client-info p { font-size: 1.1em; margin: 4px 0; text-shadow: 0 1px 3px #000; }
+        #client-info span { font-weight: bold; color: #66ff99; font-size: 1.25em; }
+
+        #client-payment-display {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 8px; min-height: 35px; padding: 5px; border: 1px dashed #ffffff88; border-radius: 8px; background-color: rgba(0,0,0,0.2);
+        }
+        #client-payment-display .currency-img { height: 35px; }
+        #client-payment-display .currency-img.coin { height: 30px; }
+        
+        #change-display-line.editable {
+            cursor: pointer;
+            text-decoration: underline;
+            text-decoration-style: dashed;
+            transition: color 0.2s ease;
+        }
+        #change-display-line.editable:hover { color: #aaffdd; }
+
+        #cash-drawer-section { margin-top: auto; }
+        #cash-drawer { background-color: #2c3e50; border-radius: 10px; padding: 10px; display: flex; flex-wrap: nowrap; gap: 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        #coin-tray { display: grid; gap: 8px; grid-template-columns: repeat(4, 1fr); flex: 1 1 50%; }
+        #bill-tray { display: flex; gap: 8px; flex: 1 1 50%; }
+        #standard-bill-tray { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; flex: 1; }
+        
+        .drawer-slot {
+            background-color: #1a2531; border: 1px solid #4a69bd; border-radius: 8px; padding: 5px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; cursor: pointer; transition: background-color 0.2s, transform 0.2s; position: relative; min-height: 70px; flex: 1;
+        }
+        .drawer-slot:hover { background-color: #3c4e66; transform: scale(1.03); }
+        .drawer-slot .currency-img { max-height: 35px; margin-bottom: 4px; }
+        .drawer-slot .currency-img.coin { max-height: 30px; }
+        
+        .slot-info { color: white; font-weight: bold; text-align: center; width: 100%; }
+        .slot-info .slot-label { font-size: 1em; }
+        .slot-info .stock-counter { font-size: 0.9em; color: #bbdefb; }
+        .slot-info .stock-counter.orange { color: #ff9800; font-weight: bold; }
+        .slot-info .stock-counter.red { color: #dc3545; font-weight: bold; }
+
+        #returned-money-area h3 { color: #fff; }
+        #returned-money-display {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; margin-top: 5px; min-height: 40px; padding: 8px; border: 1px dashed #ffffff88; border-radius: 8px; background-color: rgba(0,0,0,0.2);
+        }
+        #returned-money-display .currency-img { height: 40px; }
+        #returned-money-display .currency-img.coin { height: 35px; }
+        
+        #game-options-section .content-box > div { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        #game-options-section { color: #fff; }
+        #game-options-section p { text-shadow: 0 1px 3px #000; }
+        #timer-controls { display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: bold; }
+        #timer-display { font-size: 1.8em; background-color: #fff3e0; padding: 8px 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); min-width: 80px; text-align: center; color: #333; }
+        #timer-display.low-time { color: #dc3545; animation: pulse-red 1s infinite alternate; }
+        @keyframes pulse-red { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+        #pause-button, #mute-button, #sound-options-button { background-color: #6c757d; padding: 10px; font-size: 1em; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+        #mute-button svg, #sound-options-button svg { width: 24px; height: 24px; fill: white; pointer-events: none; }
+        #sound-options-popup { position: absolute; top: 110%; right: 0; background-color: #f8f9fa; color: #333; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1010; width: 220px; display: none; }
+        #sound-options-popup.active { display: block; }
+        
+        #summary-modal, #refill-overlay, #cash-in-modal, #pause-modal, #difficulty-selection, #large-bill-modal, #continue-modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; display: none; color: #333; }
+        #summary-modal.active, #refill-overlay.active, #cash-in-modal.active, #pause-modal.active, #difficulty-selection.active, #large-bill-modal.active, #continue-modal.active { display: flex; opacity: 1; pointer-events: auto; }
+        
+        #summary-content, #refill-dialog, #cash-in-dialog, #pause-dialog, #difficulty-dialog, #large-bill-dialog, #continue-dialog { background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); width: 90%; max-width: 650px; text-align: center; transform: translateY(-20px); transition: transform 0.3s ease, opacity 0.3s ease; }
+        #summary-modal.active #summary-content, #refill-overlay.active #refill-dialog, #cash-in-modal.active #cash-in-dialog, #pause-modal.active #pause-dialog, #difficulty-selection.active #difficulty-dialog, #large-bill-modal.active #large-bill-dialog, #continue-modal.active #continue-dialog { transform: translateY(0); opacity: 1; }
+        #cash-in-dialog input[type="number"] { width: 90%; padding: 15px; margin: 15px 0; font-size: 1.5em; text-align: center; }
+        #not-enough-button { background-color: #ff8c00; }
+        #not-enough-button:hover { background-color: #e67e00; }
+        #large-bill-buttons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        #large-bill-slot { flex: 0.25; }
+        #action-buttons { text-align: center; }
+        #emergency-refill-button { background-color: #dc3545; }
+        #emergency-refill-button:hover { background-color: #c82333; }
+
+        #summary-content { background-color: #f8f9fa; color: #212529; padding: 25px 30px; border-radius: 15px; border: 1px solid #dee2e6; max-height: 90vh; overflow-y: auto; }
+        #summary-content h2 { color: #0056b3; font-size: 2em; margin-bottom: 20px; border-bottom: 2px solid #dee2e6; padding-bottom: 15px; text-shadow: none; }
+        #summary-score-details { margin: 20px 0; text-align: left; }
+        .summary-score-line { display: flex; justify-content: space-between; padding: 12px 5px; font-size: 1.1em; border-bottom: 1px solid #e9ecef; }
+        .summary-score-line:last-child { border-bottom: none; }
+        .summary-score-line span:first-child { color: #6c757d; }
+        .summary-score-line .score-value { font-weight: bold; color: #212529; }
+        #summary-final-score-line { font-size: 1.4em; font-weight: bold; margin-top: 15px; padding-top: 15px; border-top: 3px solid #ced4da; }
+        #summary-final-score { color: #28a745; font-size: 1.1em; }
+        #summary-difference-line { font-size: 1.2em; font-weight: bold; margin-top: 20px; padding: 10px; border-radius: 8px; background-color: #e9ecef; }
+        #summary-buttons { margin-top: 25px; }
+        .success-message { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .error-message { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+
+        #error-log-container { margin-top: 25px; background-color: #f1f3f5; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; text-align: left; }
+        #error-log-container h3 { color: #343a40; border-bottom: 1px solid #ced4da; padding-bottom: 8px; margin-bottom: 12px; text-align: left; text-shadow: none; font-size: 1.2em; }
+        .error-entry { background-color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #e9ecef; }
+        .error-entry:last-child { margin-bottom: 0; }
+        .error-title { font-weight: bold; color: #c82333; margin-bottom: 5px; }
+        .error-details { font-size: 0.9em; color: #495057; }
+        .error-details span { font-weight: bold; color: #000; }
+
+        @media (max-width: 1024px) { body { overflow: auto; } #game-container { flex-direction: column; height: auto; padding: 10px; gap: 10px; } #customer-and-info-column { flex-direction: column-reverse; min-height: 300px; } #customer-display-wrapper { flex: 1 1 60%; } #client-info-section { flex: 1 1 40%; } #right-column { gap: 10px; } #cash-drawer-section { margin-top: 0; } }
+        @media (max-width: 768px) { #cash-drawer { flex-direction: column; flex-wrap: wrap; } #customer-and-info-column { flex-direction: column-reverse; min-height: auto; } #customer-display-wrapper { min-height: 250px; } }
+    </style>
+</head>
+<body>
+    <div id="message-area"></div>
+    <div id="continue-modal"><div id="continue-dialog"></div></div>
+    <div id="difficulty-selection"><div id="difficulty-dialog"></div></div>
+    <div id="summary-modal"><div id="summary-content"></div></div>
+    <div id="refill-overlay"><div id="refill-dialog"></div></div>
+    <div id="cash-in-modal"><div id="cash-in-dialog"></div></div>
+    <div id="large-bill-modal"><div id="large-bill-dialog"></div></div>
+    <div id="pause-modal"><div id="pause-dialog"></div></div>
+
+    <div id="game-container" style="display: none;">
+        <div id="customer-and-info-column">
+            <section id="client-info-section">
+                <div class="content-box">
+                    <div id="client-info">
+                        <h2>Informations Client</h2>
+                        <p>Montant à payer : <span id="amount-to-pay">0,00€</span></p>
+                        <p>Le client vous donne :</p>
+                        <div id="client-payment-display"></div>
+                        <p id="change-display-line" style="margin-top: 10px; font-weight: bold;">Monnaie à rendre : <span id="amount-to-return" style="color: #66ff99; font-size: 1.2em;">0,00€</span></p>
+                    </div>
+                </div>
+            </section>
+            <div id="customer-display-wrapper">
+                <img id="customer-image" src="images/client-1.png" alt="Client à la caisse">
+            </div>
+        </div>
+
+        <div id="right-column">
+            <section id="game-options-section">
+                 <div class="content-box">
+                    <div>
+                        <div style="text-align: center;">
+                            <p style="font-weight: bold; font-size: 1.1em; margin: 0;">
+                                Journée : <span id="current-day">1</span> | Client : <span id="current-client">0</span> / <span id="total-clients-day">0</span>
+                            </p>
+                            <p id="score-display" style="display: none;">Score : <span id="current-score">0</span></p>
+                        </div>
+                        <div id="timer-controls">
+                            <div id="timer-display">--:--</div>
+                            <button id="pause-button">Pause</button>
+                            <button id="mute-button">
+                                <svg id="icon-sound-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                                <svg id="icon-sound-off" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                            </button>
+                            <div style="position: relative;">
+                                <button id="sound-options-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59-1.69.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                                </button>
+                                <div id="sound-options-popup">
+                                    <div class="sound-control-group"><label>Musique</label><input type="range" id="music-volume" class="volume-slider" min="0" max="1" step="0.1"></div>
+                                    <div class="sound-control-group"><label>Ambiance</label><input type="range" id="ambiance-volume" class="volume-slider" min="0" max="1" step="0.1"></div>
+                                    <div class="sound-control-group"><label>Effets</label><input type="range" id="effects-volume" class="volume-slider" min="0" max="1" step="0.1"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+            <section id="cash-drawer-section" class="content-box">
+                <div id="returned-money-area">
+                    <h3>Monnaie Sélectionnée</h3>
+                    <div id="returned-money-display"></div>
+                </div>
+                <h3 style="margin-top: 10px; margin-bottom: 10px;">Tiroir-Caisse</h3>
+                <div id="cash-drawer">
+                    <div id="coin-tray"></div>
+                    <div id="bill-tray">
+                        <div id="standard-bill-tray"></div>
+                    </div>
+                </div>
+                <div id="action-buttons">
+                    <button id="cash-in-button">Encaisser le Client</button>
+                    <button id="not-enough-button">Paiement Insuffisant</button>
+                    <button id="validate-button" style="display: none;">Valider le Rendu</button>
+                    <button id="emergency-refill-button" style="display: none;">Renflouement d'Urgence</button>
+                    <button id="next-client-button" style="display: none;">Client Suivant</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <audio id="sound-billet" src="sons/billet.mp3" preload="auto"></audio>
+    <audio id="sound-piece" src="sons/piece.mp3" preload="auto"></audio>
+    <audio id="sound-caisse" src="sons/caisse.mp3" preload="auto"></audio>
+    <audio id="sound-victoire" src="sons/victoire.mp3" preload="auto"></audio>
+    <audio id="sound-echec" src="sons/echec.mp3" preload="auto"></audio>
+    <audio id="sound-musique" src="sons/musique.mp3" preload="auto" loop></audio>
+    <audio id="sound-foule" src="sons/foule.mp3" preload="auto" loop></audio>
+    
+    <script>
+        // --- Configuration ---
+        const CURRENCIES = [ { value: 500, label: '500€', type: 'bill', img: 'images/bill-500.png' }, { value: 200, label: '200€', type: 'bill', img: 'images/bill-200.png' }, { value: 100, label: '100€', type: 'bill', img: 'images/bill-100.png' }, { value: 50, label: '50€', type: 'bill', img: 'images/bill-50.png' }, { value: 20, label: '20€', type: 'bill', img: 'images/bill-20.png' }, { value: 10, label: '10€', type: 'bill', img: 'images/bill-10.png' }, { value: 5, label: '5€', type: 'bill', img: 'images/bill-5.png' }, { value: 2, label: '2€', type: 'coin', img: 'images/coin-2.png' }, { value: 1, label: '1€', type: 'coin', img: 'images/coin-1.png' }, { value: 0.50, label: '50c', type: 'coin', img: 'images/coin-0.50.png' }, { value: 0.20, label: '20c', type: 'coin', img: 'images/coin-0.20.png' }, { value: 0.10, label: '10c', type: 'coin', img: 'images/coin-0.10.png' }, { value: 0.05, label: '5c', type: 'coin', img: 'images/coin-0.05.png' }, { value: 0.02, label: '2c', type: 'coin', img: 'images/coin-0.02.png' }, { value: 0.01, label: '1c', type: 'coin', img: 'images/coin-0.01.png' } ].sort((a, b) => b.value - a.value);
+        const CLIENTS_PER_DAY = 10;
+        const REFILL_THRESHOLD = 3;
+        const REFILL_AMOUNT = 10;
+        const EMERGENCY_REFILL_AMOUNT = 5;
+        const REFILL_UPPER_THRESHOLD = 5;
+        const STOCK_GREEN_THRESHOLD = 10;
+        const STOCK_ORANGE_THRESHOLD = 5;
+
+        const DIFFICULTY_SETTINGS = {
+            easy:    { time: 45, stock: { '500': 0, '200': 1, '100': 2, '50': 15, '20': 20, '10': 25, '5': 25, '2': 30, '1': 30, '0.5': 30, '0.2': 30, '0.1': 30, '0.05': 25, '0.02': 40, '0.01': 50 } },
+            normal:  { time: 30, stock: { '500': 0, '200': 0, '100': 1, '50': 10, '20': 15, '10': 20, '5': 20, '2': 25, '1': 25, '0.5': 25, '0.2': 20, '0.1': 20, '0.05': 15, '0.02': 25, '0.01': 35 } },
+            hard:    { time: 25, stock: { '500': 0, '200': 0, '100': 0, '50': 8,  '20': 12, '10': 15, '5': 15, '2': 20, '1': 20, '0.5': 15, '0.2': 15, '0.1': 15, '0.05': 10, '0.02': 15, '0.01': 25 } },
+            extreme: { time: 20, stock: { '500': 0, '200': 0, '100': 0, '50': 6,  '20': 8,  '10': 10, '5': 10, '2': 15, '1': 15, '0.5': 10, '0.2': 10, '0.1': 10, '0.05': 8,  '0.02': 10, '0.01': 20 } }
+        };
+        
+        const SCORING = { BASE_PER_CLIENT: 100, TIME_BONUS_MULTIPLIER: 2, ACCURACY_BONUS: 50, VIGILANCE_BONUS: 30, PENALTY_CASH_IN_ERROR: 75, PENALTY_CHANGE_ERROR: 150, PENALTY_EMERGENCY_REFILL: 200, PENALTY_OVERTIME_PER_SECOND: 2, DIFFICULTY_MULTIPLIER: { easy: 1, normal: 1.5, hard: 2, extreme: 2.5 } };
+
+        // --- Éléments du DOM ---
+        const gameContainer = document.getElementById('game-container');
+        const customerImage = document.getElementById('customer-image');
+        const currentDayEl = document.getElementById('current-day');
+        const currentClientEl = document.getElementById('current-client');
+        const totalClientsDayEl = document.getElementById('total-clients-day');
+        const amountToPayEl = document.getElementById('amount-to-pay');
+        const clientPaymentDisplay = document.getElementById('client-payment-display');
+        const amountToReturnEl = document.getElementById('amount-to-return');
+        const coinTray = document.getElementById('coin-tray');
+        const billTray = document.getElementById('bill-tray');
+        const standardBillTray = document.getElementById('standard-bill-tray');
+        const returnedMoneyDisplay = document.getElementById('returned-money-display');
+        const cashInButton = document.getElementById('cash-in-button');
+        const notEnoughButton = document.getElementById('not-enough-button');
+        const validateButton = document.getElementById('validate-button');
+        const emergencyRefillButton = document.getElementById('emergency-refill-button');
+        const nextClientButton = document.getElementById('next-client-button');
+        const messageArea = document.getElementById('message-area');
+        const timerDisplay = document.getElementById('timer-display');
+        const pauseButton = document.getElementById('pause-button');
+        const muteButton = document.getElementById('mute-button');
+        const soundOptionsButton = document.getElementById('sound-options-button');
+        const soundOptionsPopup = document.getElementById('sound-options-popup');
+        const iconSoundOn = document.getElementById('icon-sound-on');
+        const iconSoundOff = document.getElementById('icon-sound-off');
+        const changeDisplayLine = document.getElementById('change-display-line');
+        const summaryModal = document.getElementById('summary-modal');
+        const refillOverlay = document.getElementById('refill-overlay');
+        const cashInModal = document.getElementById('cash-in-modal');
+        const largeBillModal = document.getElementById('large-bill-modal');
+        const difficultySelection = document.getElementById('difficulty-selection');
+        const pauseModal = document.getElementById('pause-modal');
+        const continueModal = document.getElementById('continue-modal');
+        const soundMusique = document.getElementById('sound-musique');
+        const soundFoule = document.getElementById('sound-foule');
+        const effectSounds = [ document.getElementById('sound-billet'), document.getElementById('sound-piece'), document.getElementById('sound-caisse'), document.getElementById('sound-victoire'), document.getElementById('sound-echec')];
+
+        // --- Éléments de Modale (assignés au chargement) ---
+        let difficultyButtons, highscoreDisplay, savedDayEl, confirmContinueButton, declineContinueButton;
+        let summaryContent, summaryDifference, errorLogContainer, nextDaySameDifficultyButton, changeDifficultyButton;
+        let confirmRefillButton, declineRefillButton;
+        let modalAmountToPayEl, givenMoneyInput, confirmCashInButton, cancelCashInButton, exactAmountButton;
+        let largeBillButtonsContainer, cancelLargeBillButton;
+        let resumeButton, restartFromPauseButton, musicVolumeSlider, ambianceVolumeSlider, effectsVolumeSlider, musicVolumeSliderPause, ambianceVolumeSliderPause, effectsVolumeSliderPause;
+        let summaryBaseScoreEl, summaryTimeBonusEl, summaryAccuracyBonusEl, summaryErrorPenaltyEl, summaryFinalScoreEl, currentScoreEl;
+
+        // --- Variables d'État du Jeu ---
+        let cashRegister = {}, theoreticalCashTotal = 0, actualCashTotal = 0, currentAmountToPay = 0, clientGivenMoney = 0, userEnteredGivenMoney = 0, correctChangeNeeded = 0, userChangeNeeded = 0, currentReturnedMoney = 0;
+        let returnedCurrencyList = [], clientsServedToday = 0, currentDay = 1, canRefill = true, refillCooldownTimer = null, timerInterval = null, timeLeft = 0, isPaused = false;
+        let currentDifficulty = 'normal', lastAmountToPay = 0, lastPaymentType = null, dailyErrors = [], isMuted = false, musicVolume = 0.5, ambianceVolume = 0.8, effectsVolume = 1.0;
+        let dailyScore = 0, dailyTimeBonus = 0, dailyAccuracyBonus = 0, dailyErrorPenalty = 0, dailyOvertimePenalty = 0;
+        let highScores = { easy: 0, normal: 0, hard: 0, extreme: 0 };
+        
+        // --- Fonctions Utilitaires ---
+        function playSound(id) { if (isMuted) return; const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.volume = effectsVolume; sound.play().catch(e => {}); } }
+        function formatCurrency(amount) { return amount.toFixed(2).replace('.', ',') + '€'; }
+        function showMessage(message, type, duration = 3000) { messageArea.textContent = message; messageArea.className = `message-area message-${type}`; messageArea.style.display = 'block'; setTimeout(() => { messageArea.style.display = 'none'; }, duration); }
+        function showModal(modalElement) { modalElement.classList.add('active'); if (modalElement === cashInModal && givenMoneyInput) givenMoneyInput.focus(); }
+        function hideModal(modalElement) { modalElement.classList.remove('active'); }
+
+        // --- Initialisation ---
+        window.addEventListener('load', () => {
+            function populateModals() {
+                document.getElementById('continue-dialog').innerHTML = `<h3>Partie en cours détectée</h3><p>Voulez-vous reprendre votre partie au début du <strong>jour <span id="saved-day">1</span></strong> ?</p><button id="confirm-continue-button">Oui, reprendre</button><button id="decline-continue-button">Non, nouvelle partie</button>`;
+                document.getElementById('difficulty-dialog').innerHTML = `<h2>Choisissez votre difficulté</h2><p>Meilleur score : <span id="highscore-display">0</span></p><div id="difficulty-buttons"><button data-difficulty="easy">Facile</button><button data-difficulty="normal">Normal</button><button data-difficulty="hard">Difficile</button><button data-difficulty="extreme">Extrême</button></div>`;
+                document.getElementById('summary-content').innerHTML = `<h2>Fin de Journée !</h2><div id="summary-score-details"><div class="summary-score-line"><span>Points de base (clients) :</span> <span id="summary-base-score" class="score-value">0</span></div><div class="summary-score-line"><span>Bonus de temps :</span> <span id="summary-time-bonus" class="score-value">0</span></div><div class="summary-score-line"><span>Bonus de précision & vigilance :</span> <span id="summary-accuracy-bonus" class="score-value">0</span></div><div class="summary-score-line"><span>Pénalités (erreurs, etc.) :</span> <span id="summary-error-penalty" class="score-value error-message">0</span></div><div id="summary-final-score-line" class="summary-score-line"><span>Score Final :</span> <span id="summary-final-score" class="score-value">0</span></div></div><p id="summary-difference-line">Différence de caisse : <span id="summary-difference">0,00€</span></p><div id="error-log-container" style="display: none;"><h3>Journal des Erreurs :</h3></div><div id="summary-buttons"><button id="next-day-same-difficulty-button">Journée Suivante</button><button id="change-difficulty-button">Changer de Difficulté</button></div>`;
+                document.getElementById('refill-dialog').innerHTML = `<h3>Caisse faible !</h3><p>Votre caisse est basse sur certaines coupures. Voulez-vous la renflouer avant le prochain client ?</p><button id="confirm-refill-button">Renflouer la caisse</button><button id="decline-refill-button">Continuer sans renflouer</button>`;
+                document.getElementById('cash-in-dialog').innerHTML = `<h3>Montant reçu du client</h3><p>Le montant à payer est de : <span id="modal-amount-to-pay">0,00€</span></p><p>Entrez le montant exact que le client vous a donné :</p><div class="input-group"><input type="number" id="given-money-input" step="0.01" min="0" placeholder="0.00"><span>€</span></div><div><button id="confirm-cash-in-button">Confirmer</button><button id="exact-amount-button" style="background-color: #17a2b8;">Montant Exact</button><button id="cancel-cash-in-button">Annuler</button></div><p style="font-size: 0.9em; color: #777; margin-top: 15px;">Soyez attentif, ce montant influence votre rendu de monnaie !</p>`;
+                document.getElementById('large-bill-dialog').innerHTML = `<h3>Choisir un Gros Billet</h3><div id="large-bill-buttons"></div><button id="close-large-bill-button" style="background-color: #6c757d; margin-top: 15px;">Fermer</button>`;
+                document.getElementById('pause-dialog').innerHTML = `<h3>Jeu en Pause</h3><div id="pause-sound-controls"><h4>Options Sonores</h4><div class="sound-control-group"><label for="music-volume-pause">Volume Musique</label><input type="range" id="music-volume-pause" class="volume-slider" min="0" max="1" step="0.1"></div><div class="sound-control-group"><label for="ambiance-volume-pause">Volume Ambiance</label><input type="range" id="ambiance-volume-pause" class="volume-slider" min="0" max="1" step="0.1"></div><div class="sound-control-group"><label for="effects-volume-pause">Volume Effets Sonores</label><input type="range" id="effects-volume-pause" class="volume-slider" min="0" max="1" step="0.1"></div></div><div style="margin-top: 20px;"><button id="resume-button">Reprendre le jeu</button><button id="restart-from-pause-button">Redémarrer la journée</button></div>`;
+            }
+            populateModals();
+
+            function assignModalElements() {
+                savedDayEl = document.getElementById('saved-day');
+                confirmContinueButton = document.getElementById('confirm-continue-button');
+                declineContinueButton = document.getElementById('decline-continue-button');
+                difficultyButtons = document.getElementById('difficulty-buttons');
+                highscoreDisplay = document.getElementById('highscore-display');
+                summaryContent = document.getElementById('summary-content');
+                summaryDifference = document.getElementById('summary-difference');
+                errorLogContainer = document.getElementById('error-log-container');
+                nextDaySameDifficultyButton = document.getElementById('next-day-same-difficulty-button');
+                changeDifficultyButton = document.getElementById('change-difficulty-button');
+                confirmRefillButton = document.getElementById('confirm-refill-button');
+                declineRefillButton = document.getElementById('decline-refill-button');
+                modalAmountToPayEl = document.getElementById('modal-amount-to-pay');
+                givenMoneyInput = document.getElementById('given-money-input');
+                confirmCashInButton = document.getElementById('confirm-cash-in-button');
+                cancelCashInButton = document.getElementById('cancel-cash-in-button');
+                exactAmountButton = document.getElementById('exact-amount-button');
+                largeBillButtonsContainer = document.getElementById('large-bill-buttons');
+                cancelLargeBillButton = document.getElementById('close-large-bill-button');
+                resumeButton = document.getElementById('resume-button');
+                restartFromPauseButton = document.getElementById('restart-from-pause-button');
+                musicVolumeSliderPause = document.getElementById('music-volume-pause');
+                ambianceVolumeSliderPause = document.getElementById('ambiance-volume-pause');
+                effectsVolumeSliderPause = document.getElementById('effects-volume-pause');
+                summaryBaseScoreEl = document.getElementById('summary-base-score');
+                summaryTimeBonusEl = document.getElementById('summary-time-bonus');
+                summaryAccuracyBonusEl = document.getElementById('summary-accuracy-bonus');
+                summaryErrorPenaltyEl = document.getElementById('summary-error-penalty');
+                summaryFinalScoreEl = document.getElementById('summary-final-score');
+                currentScoreEl = document.getElementById('current-score');
+                musicVolumeSlider = document.getElementById('music-volume');
+                ambianceVolumeSlider = document.getElementById('ambiance-volume');
+                effectsVolumeSlider = document.getElementById('effects-volume');
+            }
+            assignModalElements();
+            
+            initializeSoundControls();
+            loadHighScores();
+            attachEventListeners();
+
+            const savedState = JSON.parse(localStorage.getItem('cashier_save_state'));
+            if (savedState) {
+                savedDayEl.textContent = savedState.currentDay;
+                showModal(continueModal);
+            } else {
+                showModal(difficultySelection);
+            }
+        });
+
+        // --- Fonctions de Logique de Jeu ---
+        resetForNextClient = function() { changeDisplayLine.classList.remove('editable'); clientGivenMoney = 0; userEnteredGivenMoney = 0; correctChangeNeeded = 0; userChangeNeeded = 0; currentReturnedMoney = 0; returnedCurrencyList = []; amountToPayEl.textContent = formatCurrency(0); amountToReturnEl.textContent = formatCurrency(0); clientPaymentDisplay.innerHTML = ''; updateReturnedMoneyDisplay(); cashInButton.style.display = 'inline-block'; notEnoughButton.style.display = 'inline-block'; validateButton.style.display = 'none'; nextClientButton.style.display = 'none'; emergencyRefillButton.style.display = 'none'; cashInButton.disabled = false; notEnoughButton.disabled = false; emergencyRefillButton.disabled = false; validateButton.disabled = false; pauseButton.disabled = false; if(givenMoneyInput) givenMoneyInput.value = ''; customerImage.style.opacity = '0'; setTimeout(() => { customerImage.style.display = 'none'; }, 500); }
+        updateCashDrawer = function() { coinTray.innerHTML = ''; standardBillTray.innerHTML = ''; const oldLargeBillSlot = document.getElementById('large-bill-slot'); if(oldLargeBillSlot) oldLargeBillSlot.remove(); CURRENCIES.filter(c => c.type === 'coin').forEach(currency => createDrawerSlot(currency, coinTray)); CURRENCIES.filter(c => c.type === 'bill' && c.value <= 50).forEach(currency => createDrawerSlot(currency, standardBillTray)); createLargeBillSlot(billTray); }
+        createDrawerSlot = function(c,n){const t=document.createElement("div");t.className="drawer-slot",t.dataset.value=c.value;const e=document.createElement("img");e.src=c.img,e.alt=c.label,e.className=`currency-img ${c.type}`;const o=document.createElement("div");o.className="slot-info";const l=document.createElement("div");l.className="slot-label",l.textContent=c.label;const a=document.createElement("div");a.className="stock-counter";const s=cashRegister[c.value]||0;a.textContent=`x ${s}`,0===s?(t.classList.add("disabled"),a.classList.add("red")):s<=STOCK_ORANGE_THRESHOLD&&a.classList.add("orange"),o.appendChild(l),o.appendChild(a),t.appendChild(e),t.appendChild(o),!isPaused&&s>0?t.onclick=()=>addReturnedMoney(c.value):t.classList.add("disabled"),n.appendChild(t)}
+        createLargeBillSlot=function(c){const e=[100,200,500],t=e.reduce((c,e)=>c+(cashRegister[e]||0),0),o=document.createElement("div");o.className="drawer-slot",o.id="large-bill-slot";const l=document.createElement("div");l.className="slot-info";const a=document.createElement("div");a.className="slot-label",a.textContent="Gros Billets";const s=document.createElement("div");s.className="stock-counter",s.textContent=`x ${t}`,0===t?(o.classList.add("disabled"),s.classList.add("red")):t<=STOCK_ORANGE_THRESHOLD&&s.classList.add("orange"),l.appendChild(a),l.appendChild(s),o.appendChild(l),!isPaused&&t>0?o.onclick=()=>openLargeBillModal():o.classList.add("disabled"),c.appendChild(o)}
+        openLargeBillModal=function(){largeBillButtonsContainer.innerHTML="";const e=CURRENCIES.filter(c=>c.value>=100);e.forEach(c=>{const e=cashRegister[c.value]||0;if(e>0){const l=document.createElement("button");l.className="drawer-slot",l.style.cursor="pointer",l.innerHTML=`<img src="${c.img}" alt="${c.label}" class="currency-img ${c.type}"><div class="slot-info"><div class="slot-label">${c.label}</div><div class="stock-counter">x ${e}</div></div>`,l.onclick=()=>selectLargeBill(c.value),largeBillButtonsContainer.appendChild(l)}}),showModal(largeBillModal)}
+        selectLargeBill=function(c){addReturnedMoney(c)}
+        updateReturnedMoneyDisplay = function() { returnedMoneyDisplay.innerHTML = ''; const e = [...returnedCurrencyList].sort((e, t) => t - e); e.forEach(e => { const t = CURRENCIES.find(t => t.value === e); if (t) { const r = document.createElement("div"); r.className = "returned-item-wrapper"; const n = document.createElement("img"); n.src = t.img, n.alt = t.label, n.className = `currency-img ${t.type}`, r.appendChild(n), r.onclick = t => { t.stopPropagation(); const r = returnedCurrencyList.indexOf(e); -1 !== r && removeReturnedMoney(r) }, returnedMoneyDisplay.appendChild(r) } }) }
+        checkRefillNecessity=function(){if(!canRefill||["hard","extreme"].includes(currentDifficulty)||clientsServedToday<=1)return;const e=CURRENCIES.some(c=>c.value>=.05&&(cashRegister[c.value]||0)<REFILL_THRESHOLD);e&&(showModal(refillOverlay),canRefill=!1,clearTimeout(refillCooldownTimer),refillCooldownTimer=setTimeout(()=>{canRefill=!0},3e5))}
+        performRefill=function(amount, isEmergency = false){CURRENCIES.forEach(currency => {const currentStock = cashRegister[currency.value] || 0;if (isEmergency || currentStock < REFILL_UPPER_THRESHOLD) {cashRegister[currency.value] = currentStock + amount; const valueAdded = currency.value * amount; theoreticalCashTotal = parseFloat((theoreticalCashTotal + valueAdded).toFixed(2)); actualCashTotal = parseFloat((actualCashTotal + valueAdded).toFixed(2));}});updateCashDrawer();}
+        initializeCashRegister = function(isNewGame = false) { if (isNewGame) { cashRegister = {}; theoreticalCashTotal = 0; actualCashTotal = 0; const initialStock = DIFFICULTY_SETTINGS[currentDifficulty].stock; CURRENCIES.forEach(currency => { const amount = initialStock[currency.value] || 0; cashRegister[currency.value] = amount; const initialValue = currency.value * amount; theoreticalCashTotal = parseFloat((theoreticalCashTotal + initialValue).toFixed(2)); actualCashTotal = parseFloat((actualCashTotal + initialValue).toFixed(2)); }); } dailyErrors = []; updateCashDrawer(); currentDayEl.textContent = currentDay; totalClientsDayEl.textContent = CLIENTS_PER_DAY; }
+        generateAmountToPay=function(){if(lastAmountToPay>0&&Math.random()<.15)return lastAmountToPay;const e=[{min:.5,max:10,weight:.4},{min:10.01,max:50,weight:.45},{min:50.01,max:150,weight:.12},{min:150.01,max:400,weight:.03}];let t=null,a=Math.random(),n=0;for(const l of e){if(n+=l.weight,a<n){t=l;break}}t||(t=e[0]);let r=Math.random()*(t.max-t.min)+t.min,o=Math.random();return o<.25?r=Math.floor(r)+[.99,.95][Math.floor(2*Math.random())]:o<.5&&(r=Math.floor(r)+[0,.5][Math.floor(2*Math.random())]),parseFloat(r.toFixed(2))}
+        generateClientPayment=function(t,{forceSufficient:e=!1,forceDifferent:a=!1}={}){const n=CURRENCIES.filter(c=>!(c.value>4*t&&c.value>50)&&!(c.value>=200&&t<c.value/3));let r=[{type:"standard",func:createStandardPayment,weight:35},{type:"exact",func:createExactPayment,weight:15},{type:"smart",func:createSmartPayment,weight:15},{type:"allCoins",func:createAllCoinsPayment,weight:10},{type:"insufficient",func:createInsufficientPayment,weight:10},{type:"almostExact",func:createAlmostExactPayment,weight:5},{type:"largeBillSmallPurchase",func:createLargeBillPayment,weight:10}];(e||"easy"===currentDifficulty)&&(r.find(c=>"insufficient"===c.type).weight=0,r.find(c=>"almostExact"===c.type).weight=0),("hard"===currentDifficulty||"extreme"===currentDifficulty)&&(r.find(c=>"almostExact"===c.type).weight+=10),t>20&&(r.find(c=>"largeBillSmallPurchase"===c.type).weight=0,r.find(c=>"allCoins"===c.type).weight=0),t<5&&(r.find(c=>"largeBillSmallPurchase"===c.type).weight+=10),a&&((c=r.find(c=>c.type===lastPaymentType))&& (c.weight=0));const o=r.reduce((c,e)=>c+e.weight,0);let l=Math.random()*o,u=r[r.length-1];for(const c of r){if(l<c.weight){u=c;break}l-=c.weight}let i=u.func(t,n);return e&&i.amount<t&&(i=createStandardPayment(t,n)),(0===i.amount||"insufficient"===u.type&&i.amount>=t)&&(i=createStandardPayment(t,n)),i.type=u.type,i;var c}
+        createStandardPayment=function(t,e){let a=[];const n=[...e].sort((c,e)=>c.value-e.value).find(c=>c.value>=t);if(n&&Math.random()<.7)a.push(n);else{let c=t;for(const o of e)if(a.length<8&&c>.5*o.value&&Math.random()>.3&&(a.push(o),c-=o.value,a.reduce((c,e)=>c+e.value,0)>=t))break;let r=a.reduce((c,e)=>c+e.value,0);if(r<t){const i=t-r,s=[...e].sort((c,e)=>c.value-e.value).find(c=>c.value>=i);s&&a.push(s)}}return 0===a.length&&((l=[...e].sort((c,e)=>c.value-e.value).find(c=>c.value>=t))?a.push(l):e.length>0&&a.push(e[0])),{currencies:a,amount:parseFloat(a.reduce((c,e)=>c+e.value,0).toFixed(2))};var l}
+        createExactPayment=function(t,e){let a=t,n=[];for(const r of e)for(;a>=r.value&&a>.001;)n.push(r),a=parseFloat((a-r.value).toFixed(2));return a>.001?createStandardPayment(t,e):{currencies:n,amount:t}}
+        createSmartPayment=function(t,e){const a=createStandardPayment(t,e),n=a.amount-t;if(n>0&&"00"!==n.toFixed(2).slice(-2)&&"0"!==n.toFixed(2).slice(-1)){const r=parseFloat((.1*Math.ceil(10*n)-n).toFixed(2)),o=e.find(c=>c.value===r);o&&(a.currencies.push(o),a.amount=parseFloat((a.amount+o.value).toFixed(2)))}return a}
+        createInsufficientPayment=function(t,e){let a=[];const n=e.filter(c=>c.value<t);return n.length>0?(a.push(n[Math.floor(Math.random()*n.length)]),Math.random()>.5&&n.length>1&&a.push(n[Math.floor(Math.random()*n.length)])):createStandardPayment(t,e),{currencies:a,amount:parseFloat(a.reduce((c,e)=>c+e.value,0).toFixed(2))}}
+        createAllCoinsPayment=function(t,e){let a=[],n=0;const r=e.filter(c=>"coin"===c.type).sort((c,e)=>c.value-e.value);for(;n<t&&a.length<15&&r.length>0;){let c=r.pop();a.push(c),n=parseFloat((n+c.value).toFixed(2))}return n<t?createStandardPayment(t,e):{currencies:a,amount:n}}
+        createAlmostExactPayment=function(t,e){let a=createExactPayment(t,e);if(a.amount!==t||a.currencies.length<2)return createStandardPayment(t,e);const n=Math.floor(Math.random()*a.currencies.length),r=a.currencies[n],o=e.filter(c=>c.type===r.type&&Math.abs(c.value-r.value)>.001&&Math.abs(c.value-r.value)<.5);return o.length>0?a.currencies[n]=o[Math.floor(Math.random()*o.length)]:createStandardPayment(t,e),{currencies:a.currencies,amount:parseFloat(a.currencies.reduce((c,e)=>c+e.value,0).toFixed(2))}}
+        createLargeBillPayment=function(t,e){const a=e.filter(c=>c.value>=20&&c.value>3*t);return a.length>0?{currencies:[a[Math.floor(Math.random()*a.length)]],amount:a[Math.floor(Math.random()*a.length)].value}:createStandardPayment(t,e)}
+        displayClientPayment=function(c){clientPaymentDisplay.innerHTML="";let e=[...c.currencies];Math.random()<.33?e.sort(()=>.5-Math.random()):e.sort((c,e)=>e.value-c.value),e.forEach(c=>{const e=document.createElement("img");e.src=c.img,e.alt=c.label,e.className=`currency-img ${c.type}`,clientPaymentDisplay.appendChild(e)}),clientGivenMoney=c.amount}
+        startNewClient=function(){if(clientsServedToday>=CLIENTS_PER_DAY){stopTimer(),endOfDaySummary();return}resetForNextClient(),clientsServedToday++,currentClientEl.textContent=clientsServedToday,setTimeout(()=>{const c=Math.floor(12*Math.random())+1;customerImage.src=`images/client-${c}.png`,customerImage.style.display="block",setTimeout(()=>{customerImage.style.opacity="1"},50)},600);const c=generateAmountToPay(),e=c===lastAmountToPay;lastAmountToPay=c,currentAmountToPay=c,amountToPayEl.textContent=formatCurrency(currentAmountToPay);const t=generateClientPayment(currentAmountToPay,{forceDifferent:e});lastPaymentType=t.type,displayClientPayment(t),updateCashDrawer(),checkRefillNecessity(),timeLeft=DIFFICULTY_SETTINGS[currentDifficulty].time,startTimer()}
+        handleInsufficientPayment=function(){if(clientGivenMoney>=currentAmountToPay){showMessage("Erreur de jugement. Le paiement du client est suffisant.","info");return}const c=SCORING.VIGILANCE_BONUS*SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty];dailyScore+=c,dailyAccuracyBonus+=c,currentScoreEl.textContent=dailyScore,showMessage("Bien vu ! Le client s'excuse et corrige son paiement.","success",4e3),playSound("sound-piece");const e=generateClientPayment(currentAmountToPay,{forceSufficient:!0});displayClientPayment(e)}
+        handleCashIn=function(){stopTimer(),modalAmountToPayEl.textContent=formatCurrency(currentAmountToPay),givenMoneyInput.value="",showModal(cashInModal)}
+        
+        confirmCashIn = function() {
+            userEnteredGivenMoney = parseFloat(givenMoneyInput.value);
+            if (isNaN(userEnteredGivenMoney) || userEnteredGivenMoney < 0) {
+                showMessage("Veuillez entrer un montant valide.", "error");
+                startTimer();
+                return;
+            }
+            
+            actualCashTotal = parseFloat((actualCashTotal + clientGivenMoney).toFixed(2));
+            correctChangeNeeded = parseFloat((clientGivenMoney - currentAmountToPay).toFixed(2));
+            userChangeNeeded = parseFloat((userEnteredGivenMoney - currentAmountToPay).toFixed(2));
+            
+            amountToReturnEl.textContent = formatCurrency(Math.max(0, userChangeNeeded));
+            hideModal(cashInModal);
+            cashInButton.style.display = 'none';
+            notEnoughButton.style.display = 'none';
+            validateButton.style.display = 'inline-block';
+            emergencyRefillButton.style.display = 'inline-block';
+            nextClientButton.style.display = 'none';
+            validateButton.disabled = false;
+            changeDisplayLine.classList.add('editable');
+            updateCashDrawer();
+            startTimer();
+        }
+
+        cancelCashIn = function() { hideModal(cashInModal); givenMoneyInput.value = ''; startTimer(); }
+        
+        reEnterAmount = function() {
+            if (validateButton.style.display === 'none') return;
+            stopTimer();
+
+            actualCashTotal = parseFloat((actualCashTotal - clientGivenMoney).toFixed(2));
+            
+            returnedCurrencyList.forEach(value => {
+                cashRegister[value]++;
+                actualCashTotal = parseFloat((actualCashTotal + value).toFixed(2));
+            });
+            currentReturnedMoney = 0;
+            returnedCurrencyList = [];
+            
+            updateReturnedMoneyDisplay();
+            updateCashDrawer();
+            amountToReturnEl.textContent = formatCurrency(0);
+            changeDisplayLine.classList.remove('editable');
+            validateButton.style.display = 'none';
+            emergencyRefillButton.style.display = 'none';
+            cashInButton.style.display = 'inline-block';
+            notEnoughButton.style.display = 'inline-block';
+            
+            modalAmountToPayEl.textContent = formatCurrency(currentAmountToPay);
+            givenMoneyInput.value = userEnteredGivenMoney > 0 ? userEnteredGivenMoney.toFixed(2) : '';
+            showModal(cashInModal);
+        }
+
+        handleExactAmountClick = function() { if (givenMoneyInput) { givenMoneyInput.value = currentAmountToPay.toFixed(2); confirmCashInButton.focus(); } }
+        addReturnedMoney = function(value) { if (isPaused) return; const currency = CURRENCIES.find(c => c.value === value); if (!currency) return; if ((cashRegister[value] || 0) <= 0) { showMessage(`Vous n'avez plus de ${currency.label} en caisse !`, 'error'); return; } if(currency.type === 'bill') playSound('sound-billet'); else playSound('sound-piece'); cashRegister[value]--; actualCashTotal = parseFloat((actualCashTotal - value).toFixed(2)); returnedCurrencyList.push(value); currentReturnedMoney = parseFloat((currentReturnedMoney + value).toFixed(2)); updateReturnedMoneyDisplay(); updateCashDrawer(); }
+        removeReturnedMoney = function(indexToRemove) { if (isPaused) return; if (indexToRemove === undefined || indexToRemove < 0 || indexToRemove >= returnedCurrencyList.length) return; const removedValue = returnedCurrencyList.splice(indexToRemove, 1)[0]; const currency = CURRENCIES.find(c => c.value === removedValue); if(currency.type === 'bill') playSound('sound-billet'); else playSound('sound-piece'); cashRegister[removedValue]++; actualCashTotal = parseFloat((actualCashTotal + removedValue).toFixed(2)); currentReturnedMoney = parseFloat((currentReturnedMoney - removedValue).toFixed(2)); updateReturnedMoneyDisplay(); updateCashDrawer(); }
+        
+        validateChange = function() {
+            stopTimer();
+            playSound('sound-caisse');
+            validateButton.disabled = true;
+            changeDisplayLine.classList.remove('editable');
+            emergencyRefillButton.style.display = 'none';
+
+            let clientScore = SCORING.BASE_PER_CLIENT;
+            let hasError = false;
+
+            if (timeLeft > 0) {
+                const timeBonus = timeLeft * SCORING.TIME_BONUS_MULTIPLIER;
+                clientScore += timeBonus;
+                dailyTimeBonus += timeBonus;
+            }
+            
+            theoreticalCashTotal = parseFloat((theoreticalCashTotal + currentAmountToPay).toFixed(2));
+            
+            if (Math.abs(userEnteredGivenMoney - clientGivenMoney) > 0.001) {
+                hasError = true;
+                clientScore -= SCORING.PENALTY_CASH_IN_ERROR;
+                dailyErrorPenalty += SCORING.PENALTY_CASH_IN_ERROR;
+                dailyErrors.push({type: 'encaissement', client: clientsServedToday, clientGave: clientGivenMoney, userEntered: userEnteredGivenMoney });
+            }
+            if (Math.abs(currentReturnedMoney - correctChangeNeeded) > 0.001) {
+                hasError = true;
+                clientScore -= SCORING.PENALTY_CHANGE_ERROR;
+                dailyErrorPenalty += SCORING.PENALTY_CHANGE_ERROR;
+                dailyErrors.push({type: 'rendu', client: clientsServedToday, expected: correctChangeNeeded, returned: currentReturnedMoney, returnedItems: [...returnedCurrencyList]});
+            }
+            if (!hasError) {
+                clientScore += SCORING.ACCURACY_BONUS;
+                dailyAccuracyBonus += SCORING.ACCURACY_BONUS;
+            }
+            
+            clientScore *= SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty];
+            dailyScore += Math.round(clientScore);
+            currentScoreEl.textContent = dailyScore;
+            nextClientButton.style.display = 'inline-block';
+            pauseButton.disabled = true;
+        }
+        
+        endOfDaySummary = function() { 
+            customerImage.style.opacity = '0'; setTimeout(() => { customerImage.style.display = 'none'; }, 500); soundFoule.pause(); 
+            const totalErrorPenalty = dailyErrorPenalty + dailyOvertimePenalty;
+            const finalScore = dailyScore - dailyOvertimePenalty;
+            saveHighScore(finalScore); 
+            summaryBaseScoreEl.textContent = clientsServedToday * SCORING.BASE_PER_CLIENT; 
+            summaryTimeBonusEl.textContent = Math.round(dailyTimeBonus); 
+            summaryAccuracyBonusEl.textContent = dailyAccuracyBonus; 
+            summaryErrorPenaltyEl.textContent = -totalErrorPenalty; 
+            summaryFinalScoreEl.textContent = finalScore; 
+
+            if (dailyOvertimePenalty > 0) { dailyErrors.push({ type: 'temps_depasse', details: `Vous avez accumulé une pénalité de ${dailyOvertimePenalty} points pour temps dépassé.` }); }
+
+            const actualCents = Math.round(actualCashTotal * 100);
+            const theoreticalCents = Math.round(theoreticalCashTotal * 100);
+            const difference = (actualCents - theoreticalCents) / 100;
+            
+            summaryDifference.textContent = formatCurrency(Math.abs(difference)); 
+            if (Math.abs(difference) < 0.001) { 
+                playSound('sound-victoire'); 
+                summaryDifference.classList.remove('error-message'); 
+                summaryDifference.classList.add('success-message'); 
+                summaryDifference.textContent += ' (Caisse juste !)'; 
+            } else { 
+                playSound('sound-echec'); 
+                summaryDifference.classList.remove('success-message'); 
+                summaryDifference.classList.add('error-message'); 
+                summaryDifference.textContent += difference > 0 ? ' (Excédent)' : ' (Manquant)'; 
+                dailyErrors.push({ type: 'difference_caisse', details: `La caisse présente un ${difference > 0 ? 'excédent' : 'manquant'} de ${formatCurrency(Math.abs(difference))}.` }); 
+            } 
+            
+            errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3>'; 
+            if (dailyErrors.length > 0) { 
+                errorLogContainer.style.display = 'block'; 
+                dailyErrors.forEach(err => { 
+                    const entry = document.createElement('div'); entry.className = 'error-entry'; 
+                    if (err.type === 'encaissement') entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur d'encaissement</div><div class="error-details">Le client a donné <span>${formatCurrency(err.clientGave)}</span>, vous avez saisi <span>${formatCurrency(err.userEntered)}</span>.</div>`; 
+                    else if (err.type === 'rendu') { const r = err.returnedItems.reduce((a,v)=>{a[v]=(a[v]||0)+1;return a},{}); const s=Object.entries(r).map(([v,c])=>`${c}x ${CURRENCIES.find(i=>i.value==v).label}`).join(', '); entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur de rendu</div><div class="error-details">Rendu attendu : <span>${formatCurrency(err.expected)}</span>. Vous avez rendu : <span>${formatCurrency(err.returned)}</span>.<br>Détail : ${s||'rien'}</div>`;} 
+                    else if (err.type === 'temps_depasse') entry.innerHTML = `<div class="error-title">Pénalité de Temps</div><div class="error-details">${err.details}</div>`; 
+                    else if (err.type === 'difference_caisse') entry.innerHTML = `<div class="error-title">Erreur de Caisse</div><div class="error-details">${err.details}</div>`; 
+                    errorLogContainer.appendChild(entry); }); 
+            } else { errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3><div class="error-entry">Aucune erreur, félicitations !</div>'; errorLogContainer.style.display = 'block'; } 
+            showModal(summaryModal); 
+        }
+
+        // --- CORRECTION APPLIQUÉE ICI ---
+        startNextDay = function() {
+            hideModal(summaryModal);
+            clientsServedToday = 0;
+            dailyScore = 0;
+            dailyTimeBonus = 0;
+            dailyAccuracyBonus = 0;
+            dailyErrorPenalty = 0;
+            dailyOvertimePenalty = 0;
+            currentScoreEl.textContent = '0';
+            currentDay++;
+
+            // Cette ligne est la clé. Elle resynchronise la caisse théorique avec la caisse réelle.
+            // L'état de la caisse à la fin de la journée devient le point de départ correct pour la nouvelle journée.
+            theoreticalCashTotal = actualCashTotal;
+
+            initializeCashRegister(false);
+            saveGameState();
+            if (!isMuted) soundFoule.play().catch(e => {});
+            startNewClient();
+        }
+
+        startTimer = function() { if (timerInterval) return; timerInterval = setInterval(() => { if (isPaused) return; timeLeft--; if (timeLeft < 0) { dailyOvertimePenalty += SCORING.PENALTY_OVERTIME_PER_SECOND; if (timeLeft === -1) { showMessage("Temps dépassé ! Chaque seconde ajoute une pénalité.", "info", 2500); playSound('sound-echec'); } } updateTimerDisplay(); }, 1000); }
+        stopTimer = function() { clearInterval(timerInterval); timerInterval = null; }
+        updateTimerDisplay = function() { const i = timeLeft < 0; const r = Math.abs(timeLeft); const m = Math.floor(r / 60); const s = r % 60; timerDisplay.textContent = `${i?'-':''}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; timerDisplay.classList.toggle('low-time', timeLeft <= 10 && !i); }
+        pauseGame = function() { if (isPaused) return; isPaused = true; stopTimer(); updateCashDrawer(); showModal(pauseModal); }
+        resumeGame = function() { if (!isPaused) return; isPaused = false; hideModal(pauseModal); startTimer(); updateCashDrawer(); }
+        handlePauseToggle = function() { if (difficultySelection.classList.contains('active') || summaryModal.classList.contains('active')) return; if(isPaused) resumeGame(); else pauseGame(); }
+        resetGameToDifficultySelection = function() { stopTimer(); isPaused = false; clientsServedToday = 0; dailyScore = 0; dailyTimeBonus = 0; dailyAccuracyBonus = 0; dailyErrorPenalty = 0; dailyOvertimePenalty = 0; currentScoreEl.textContent = '0'; currentDay = 1; lastAmountToPay = 0; lastPaymentType = null; canRefill = true; clearTimeout(refillCooldownTimer); localStorage.removeItem('cashier_save_state'); hideModal(pauseModal); hideModal(summaryModal); showModal(difficultySelection); }
+        startGame = function(difficulty) { currentDifficulty = difficulty; hideModal(difficultySelection); gameContainer.style.display = 'flex'; initializeCashRegister(true); if (!isMuted) { soundMusique.play().catch(e => {}); soundFoule.play().catch(e => {}); } saveGameState(); startNewClient(); }
+        toggleMute = function() { isMuted = !isMuted; soundMusique.muted = isMuted; soundFoule.muted = isMuted; effectSounds.forEach(s=>s.muted=isMuted); iconSoundOn.style.display = isMuted ? 'none' : 'block'; iconSoundOff.style.display = isMuted ? 'block' : 'none'; }
+        updateMusicVolume = function(v) { const n=parseFloat(v); musicVolume=n; soundMusique.volume=n; if(musicVolumeSlider)musicVolumeSlider.value=n; if(musicVolumeSliderPause)musicVolumeSliderPause.value=n; }
+        updateAmbianceVolume = function(v) { const n=parseFloat(v); ambianceVolume=n; soundFoule.volume=n; if(ambianceVolumeSlider)ambianceVolumeSlider.value=n; if(ambianceVolumeSliderPause)ambianceVolumeSliderPause.value=n; }
+        updateEffectsVolume = function(v) { const n=parseFloat(v); effectsVolume=n; if(effectsVolumeSlider)effectsVolumeSlider.value=n; if(effectsVolumeSliderPause)effectsVolumeSliderPause.value=n; }
+        initializeSoundControls = function() { updateMusicVolume(musicVolume); updateAmbianceVolume(ambianceVolume); updateEffectsVolume(effectsVolume); }
+        saveGameState = function() { const s = { currentDay, dailyScore, cashRegister, theoreticalCashTotal, actualCashTotal, currentDifficulty }; localStorage.setItem('cashier_save_state', JSON.stringify(s)); }
+        loadGameState = function() { const s = JSON.parse(localStorage.getItem('cashier_save_state')); if (!s) return false; currentDay = s.currentDay; dailyScore = s.dailyScore; cashRegister = s.cashRegister; theoreticalCashTotal = s.theoreticalCashTotal; actualCashTotal = s.actualCashTotal; currentDifficulty = s.currentDifficulty; currentScoreEl.textContent = dailyScore; hideModal(continueModal); gameContainer.style.display = 'flex'; if (!isMuted) { soundMusique.play().catch(e => {}); soundFoule.play().catch(e => {}); } initializeCashRegister(false); startNewClient(); return true; }
+        saveHighScore = function(s) { if (s > highScores[currentDifficulty]) { highScores[currentDifficulty] = s; localStorage.setItem('cashier_high_scores', JSON.stringify(highScores)); } }
+        loadHighScores = function() { const s = JSON.parse(localStorage.getItem('cashier_high_scores')); if (s) highScores = s; }
+        
+        function attachEventListeners() {
+            muteButton.addEventListener('click', toggleMute);
+            soundOptionsButton.addEventListener('click', (e) => { e.stopPropagation(); soundOptionsPopup.classList.toggle('active'); });
+            document.addEventListener('click', (e) => { if (soundOptionsPopup && !soundOptionsPopup.contains(e.target) && !soundOptionsButton.contains(e.target)) { soundOptionsPopup.classList.remove('active'); } });
+            [musicVolumeSlider, ambianceVolumeSlider, effectsVolumeSlider, musicVolumeSliderPause, ambianceVolumeSliderPause, effectsVolumeSliderPause].forEach(s => { if(s) { const t=s.id.split('-')[0]; s.addEventListener('input', e=>{if(t==='music')updateMusicVolume(e.target.value);else if(t==='ambiance')updateAmbianceVolume(e.target.value);else if(t==='effects')updateEffectsVolume(e.target.value);});}});
+            cashInButton.addEventListener('click', handleCashIn);
+            notEnoughButton.addEventListener('click', handleInsufficientPayment);
+            confirmCashInButton.addEventListener('click', confirmCashIn);
+            cancelCashInButton.addEventListener('click', cancelCashIn);
+            exactAmountButton.addEventListener('click', handleExactAmountClick);
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (largeBillModal.classList.contains('active')) hideModal(largeBillModal); else if (cashInModal.classList.contains('active')) cancelCashIn(); else if (soundOptionsPopup.classList.contains('active')) soundOptionsPopup.classList.remove('active'); else handlePauseToggle(); return; } if (document.activeElement === givenMoneyInput) { if (e.key === 'Enter') { e.preventDefault(); confirmCashInButton.click(); } return; } if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (difficultySelection.classList.contains('active')) startGame('normal'); else if (cashInModal.classList.contains('active')) confirmCashInButton.click(); else if (refillOverlay.classList.contains('active')) confirmRefillButton.click(); else if (summaryModal.classList.contains('active')) nextDaySameDifficultyButton.click(); else if (pauseModal.classList.contains('active')) resumeButton.click(); else if (largeBillModal.classList.contains('active')) { const b=largeBillButtonsContainer.querySelector('button'); if(b)b.click(); } else if (nextClientButton.style.display !== 'none') nextClientButton.click(); else if (validateButton.style.display !== 'none' && !validateButton.disabled) validateButton.click(); else if (cashInButton.style.display !== 'none') cashInButton.click(); else if (e.key === ' ') handlePauseToggle(); } });
+            validateButton.addEventListener('click', validateChange);
+            changeDisplayLine.addEventListener('click', reEnterAmount);
+            nextClientButton.addEventListener('click', startNewClient);
+            nextDaySameDifficultyButton.addEventListener('click', startNextDay);
+            changeDifficultyButton.addEventListener('click', resetGameToDifficultySelection);
+            restartFromPauseButton.addEventListener('click', resetGameToDifficultySelection);
+            confirmRefillButton.addEventListener('click', () => { performRefill(REFILL_AMOUNT); hideModal(refillOverlay); });
+            declineRefillButton.addEventListener('click', () => { hideModal(refillOverlay); });
+            emergencyRefillButton.addEventListener('click', () => {performRefill(EMERGENCY_REFILL_AMOUNT, true); showMessage("Renflouement d'urgence effectué.", "success"); emergencyRefillButton.disabled = true; const penalty = SCORING.PENALTY_EMERGENCY_REFILL * SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty]; dailyScore -= penalty; dailyErrorPenalty += penalty; currentScoreEl.textContent = dailyScore; });
+            pauseButton.addEventListener('click', handlePauseToggle);
+            resumeButton.addEventListener('click', resumeGame);
+            cancelLargeBillButton.addEventListener('click', () => hideModal(largeBillModal));
+            difficultyButtons.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON') { const d=e.target.dataset.difficulty; if(d)startGame(d); } });
+            difficultyButtons.addEventListener('mouseover', (e) => { if (e.target.tagName === 'BUTTON') { const d=e.target.dataset.difficulty; if(d)highscoreDisplay.textContent=highScores[d]||0; } });
+            confirmContinueButton.addEventListener('click', loadGameState);
+            declineContinueButton.addEventListener('click', () => { localStorage.removeItem('cashier_save_state'); hideModal(continueModal); showModal(difficultySelection); });
+        }
+    </script>
+</body>
+</html>
