@@ -221,11 +221,11 @@
         #sound-options-popup { position: absolute; top: 110%; right: 0; background-color: #f8f9fa; color: #333; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1010; width: 220px; display: none; }
         #sound-options-popup.active { display: block; }
         
-        #summary-modal, #refill-overlay, #cash-in-modal, #pause-modal, #difficulty-selection, #large-bill-modal, #continue-modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; display: none; color: #333; }
-        #summary-modal.active, #refill-overlay.active, #cash-in-modal.active, #pause-modal.active, #difficulty-selection.active, #large-bill-modal.active, #continue-modal.active { display: flex; opacity: 1; pointer-events: auto; }
+        #summary-modal, #refill-overlay, #cash-in-modal, #pause-modal, #difficulty-selection, #large-bill-modal, #continue-modal, #rank-modal, #rank-up-modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); justify-content: center; align-items: center; backdrop-filter: blur(3px); opacity: 0; transition: opacity 0.3s ease; pointer-events: none; display: none; color: #333; }
+        #summary-modal.active, #refill-overlay.active, #cash-in-modal.active, #pause-modal.active, #difficulty-selection.active, #large-bill-modal.active, #continue-modal.active, #rank-modal.active, #rank-up-modal.active { display: flex; opacity: 1; pointer-events: auto; }
         
-        #summary-content, #refill-dialog, #cash-in-dialog, #pause-dialog, #difficulty-dialog, #large-bill-dialog, #continue-dialog { background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); width: 90%; max-width: 650px; text-align: center; transform: translateY(-20px); transition: transform 0.3s ease, opacity 0.3s ease; }
-        #summary-modal.active #summary-content, #refill-overlay.active #refill-dialog, #cash-in-modal.active #cash-in-dialog, #pause-modal.active #pause-dialog, #difficulty-selection.active #difficulty-dialog, #large-bill-modal.active #large-bill-dialog, #continue-modal.active #continue-dialog { transform: translateY(0); opacity: 1; }
+        #summary-content, #refill-dialog, #cash-in-dialog, #pause-dialog, #difficulty-dialog, #large-bill-dialog, #continue-dialog, #rank-dialog, #rank-up-dialog { background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); width: 90%; max-width: 650px; text-align: center; transform: translateY(-20px); transition: transform 0.3s ease, opacity 0.3s ease; }
+        #summary-modal.active #summary-content, #refill-overlay.active #refill-dialog, #cash-in-modal.active #cash-in-dialog, #pause-modal.active #pause-dialog, #difficulty-selection.active #difficulty-dialog, #large-bill-modal.active #large-bill-dialog, #continue-modal.active #continue-dialog, #rank-modal.active #rank-dialog, #rank-up-modal.active #rank-up-dialog { transform: translateY(0); opacity: 1; }
         #cash-in-dialog input[type="number"] { width: 90%; padding: 15px; margin: 15px 0; font-size: 1.5em; text-align: center; }
         #not-enough-button { background-color: #ff8c00; }
         #not-enough-button:hover { background-color: #e67e00; }
@@ -257,6 +257,53 @@
         .error-details { font-size: 0.9em; color: #495057; }
         .error-details span { font-weight: bold; color: #000; }
 
+        /* Styles pour les nouvelles modales */
+        #rank-button { 
+            background-color: #ffc107; 
+            padding: 10px; 
+            font-size: 1.2em; 
+            width: 44px; height: 44px; 
+            display: flex; align-items: center; justify-content: center;
+            color: #333;
+        }
+        #rank-button:hover {
+            background-color: #e0a800;
+        }
+        #rank-dialog { max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        #rank-dialog h2 { color: #0056b3; text-shadow: none; }
+        #rank-dialog .rank-list { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
+        #rank-dialog .rank-item { background-color: #f1f3f5; padding: 10px 15px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #dee2e6; }
+        #rank-dialog .rank-item.achieved { background-color: #d4edda; border-color: #c3e6cb; font-weight: bold; }
+        #rank-dialog .rank-item.current { border-left: 5px solid #ffc107; }
+        #rank-dialog .rank-points { float: right; color: #6c757d; }
+        #rank-dialog #rank-progress { margin-top: 15px; font-size: 1.1em; }
+
+        #rank-up-dialog {
+            background: linear-gradient(145deg, #ffffff, #f0f8ff);
+            border: 2px solid #ffc107;
+            box-shadow: 0 10px 50px rgba(255, 193, 7, 0.4);
+            max-width: 550px;
+        }
+        .rank-up-title {
+            font-size: 2.2em;
+            color: #e0a800;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        #new-rank-name-display {
+            font-size: 1.8em;
+            color: #0056b3;
+            margin: 10px 0;
+            text-shadow: none;
+        }
+        #points-to-next-rank-display {
+            font-size: 1.1em;
+            margin-top: 15px;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+
         @media (max-width: 1024px) { body { overflow: auto; } #game-container { flex-direction: column; height: auto; padding: 10px; gap: 10px; } #customer-and-info-column { flex-direction: column-reverse; min-height: 300px; } #customer-display-wrapper { flex: 1 1 60%; } #client-info-section { flex: 1 1 40%; } #right-column { gap: 10px; } #cash-drawer-section { margin-top: 0; } }
         @media (max-width: 768px) { #cash-drawer { flex-direction: column; flex-wrap: wrap; } #customer-and-info-column { flex-direction: column-reverse; min-height: auto; } #customer-display-wrapper { min-height: 250px; } }
     </style>
@@ -270,6 +317,9 @@
     <div id="cash-in-modal"><div id="cash-in-dialog"></div></div>
     <div id="large-bill-modal"><div id="large-bill-dialog"></div></div>
     <div id="pause-modal"><div id="pause-dialog"></div></div>
+    <div id="rank-modal"><div id="rank-dialog"></div></div>
+    <div id="rank-up-modal"><div id="rank-up-dialog"></div></div>
+
 
     <div id="game-container" style="display: none;">
         <div id="customer-and-info-column">
@@ -300,6 +350,7 @@
                             <p id="score-display" style="display: none;">Score : <span id="current-score">0</span></p>
                         </div>
                         <div id="timer-controls">
+                            <button id="rank-button" title="Afficher les Rangs">🏆</button>
                             <div id="timer-display">--:--</div>
                             <button id="pause-button">Pause</button>
                             <button id="mute-button">
@@ -362,6 +413,17 @@
         const STOCK_GREEN_THRESHOLD = 10;
         const STOCK_ORANGE_THRESHOLD = 5;
 
+        const RANKS = [
+            { name: "Caissier Débutant", points: 0 },
+            { name: "Employé Appliqué", points: 5000 },
+            { name: "Spécialiste de la Monnaie", points: 15000 },
+            { name: "Gestionnaire Efficace", points: 30000 },
+            { name: "Virtuose de la Caisse", points: 50000 },
+            { name: "Superviseur d'Élite", points: 75000 },
+            { name: "Baron du Billet", points: 100000 },
+            { name: "Maître du Coffre-Fort", points: 150000 }
+        ].sort((a, b) => a.points - b.points);
+
         const DIFFICULTY_SETTINGS = {
             easy:    { time: 45, stock: { '500': 0, '200': 1, '100': 2, '50': 15, '20': 20, '10': 25, '5': 25, '2': 30, '1': 30, '0.5': 30, '0.2': 30, '0.1': 30, '0.05': 25, '0.02': 40, '0.01': 50 } },
             normal:  { time: 30, stock: { '500': 0, '200': 0, '100': 1, '50': 10, '20': 15, '10': 20, '5': 20, '2': 25, '1': 25, '0.5': 25, '0.2': 20, '0.1': 20, '0.05': 15, '0.02': 25, '0.01': 35 } },
@@ -408,6 +470,10 @@
         const soundMusique = document.getElementById('sound-musique');
         const soundFoule = document.getElementById('sound-foule');
         const effectSounds = [ document.getElementById('sound-billet'), document.getElementById('sound-piece'), document.getElementById('sound-caisse'), document.getElementById('sound-victoire'), document.getElementById('sound-echec')];
+        const rankButton = document.getElementById('rank-button');
+        const rankModal = document.getElementById('rank-modal');
+        const rankUpModal = document.getElementById('rank-up-modal');
+
 
         // --- Éléments de Modale (assignés au chargement) ---
         let difficultyButtons, highscoreDisplay, savedDayEl, confirmContinueButton, declineContinueButton;
@@ -417,6 +483,7 @@
         let largeBillButtonsContainer, cancelLargeBillButton;
         let resumeButton, restartFromPauseButton, musicVolumeSlider, ambianceVolumeSlider, effectsVolumeSlider, musicVolumeSliderPause, ambianceVolumeSliderPause, effectsVolumeSliderPause;
         let summaryBaseScoreEl, summaryTimeBonusEl, summaryAccuracyBonusEl, summaryErrorPenaltyEl, summaryFinalScoreEl, currentScoreEl;
+        let rankDialog, rankUpDialog, newRankNameDisplay, pointsToNextRankDisplay, closeRankUpModalButton;
 
         // --- Variables d'État du Jeu ---
         let cashRegister = {}, theoreticalCashTotal = 0, actualCashTotal = 0, currentAmountToPay = 0, clientGivenMoney = 0, userEnteredGivenMoney = 0, correctChangeNeeded = 0, userChangeNeeded = 0, currentReturnedMoney = 0;
@@ -424,6 +491,8 @@
         let currentDifficulty = 'normal', lastAmountToPay = 0, lastPaymentType = null, dailyErrors = [], isMuted = false, musicVolume = 0.5, ambianceVolume = 0.8, effectsVolume = 1.0;
         let dailyScore = 0, dailyTimeBonus = 0, dailyAccuracyBonus = 0, dailyErrorPenalty = 0, dailyOvertimePenalty = 0;
         let highScores = { easy: 0, normal: 0, hard: 0, extreme: 0 };
+        let cumulativeScore = 0;
+        let currentRank = RANKS[0];
         
         // --- Fonctions Utilitaires ---
         function playSound(id) { if (isMuted) return; const sound = document.getElementById(id); if (sound) { sound.currentTime = 0; sound.volume = effectsVolume; sound.play().catch(e => {}); } }
@@ -437,11 +506,13 @@
             function populateModals() {
                 document.getElementById('continue-dialog').innerHTML = `<h3>Partie en cours détectée</h3><p>Voulez-vous reprendre votre partie au début du <strong>jour <span id="saved-day">1</span></strong> ?</p><button id="confirm-continue-button">Oui, reprendre</button><button id="decline-continue-button">Non, nouvelle partie</button>`;
                 document.getElementById('difficulty-dialog').innerHTML = `<h2>Choisissez votre difficulté</h2><p>Meilleur score : <span id="highscore-display">0</span></p><div id="difficulty-buttons"><button data-difficulty="easy">Facile</button><button data-difficulty="normal">Normal</button><button data-difficulty="hard">Difficile</button><button data-difficulty="extreme">Extrême</button></div>`;
-                document.getElementById('summary-content').innerHTML = `<h2>Fin de Journée !</h2><div id="summary-score-details"><div class="summary-score-line"><span>Points de base (clients) :</span> <span id="summary-base-score" class="score-value">0</span></div><div class="summary-score-line"><span>Bonus de temps :</span> <span id="summary-time-bonus" class="score-value">0</span></div><div class="summary-score-line"><span>Bonus de précision & vigilance :</span> <span id="summary-accuracy-bonus" class="score-value">0</span></div><div class="summary-score-line"><span>Pénalités (erreurs, etc.) :</span> <span id="summary-error-penalty" class="score-value error-message">0</span></div><div id="summary-final-score-line" class="summary-score-line"><span>Score Final :</span> <span id="summary-final-score" class="score-value">0</span></div></div><p id="summary-difference-line">Différence de caisse : <span id="summary-difference">0,00€</span></p><div id="error-log-container" style="display: none;"><h3>Journal des Erreurs :</h3></div><div id="summary-buttons"><button id="next-day-same-difficulty-button">Journée Suivante</button><button id="change-difficulty-button">Changer de Difficulté</button></div>`;
+                document.getElementById('summary-content').innerHTML = `<h2>Fin de Journée !</h2><div id="summary-score-details"><div class="summary-score-line"><span>Points de base (clients) :</span> <span id="summary-base-score" class="score-value">0</span></div><div class="summary-score-line"><span>Bonus de temps :</span> <span id="summary-time-bonus" class="score-value">0</span></div><div class="summary-score-line"><span>Bonus de précision & vigilance :</span> <span id="summary-accuracy-bonus" class="score-value">0</span></div><div class="summary-score-line"><span>Pénalités (erreurs, etc.) :</span> <span id="summary-error-penalty" class="score-value error-message">0</span></div><div id="summary-final-score-line" class="summary-score-line"><span>Score Final de la journée :</span> <span id="summary-final-score" class="score-value">0</span></div></div><p id="summary-difference-line">Différence de caisse : <span id="summary-difference">0,00€</span></p><div id="error-log-container" style="display: none;"><h3>Journal des Erreurs :</h3></div><div id="summary-buttons"><button id="next-day-same-difficulty-button">Journée Suivante</button><button id="change-difficulty-button">Changer de Difficulté</button></div>`;
                 document.getElementById('refill-dialog').innerHTML = `<h3>Caisse faible !</h3><p>Votre caisse est basse sur certaines coupures. Voulez-vous la renflouer avant le prochain client ?</p><button id="confirm-refill-button">Renflouer la caisse</button><button id="decline-refill-button">Continuer sans renflouer</button>`;
                 document.getElementById('cash-in-dialog').innerHTML = `<h3>Montant reçu du client</h3><p>Le montant à payer est de : <span id="modal-amount-to-pay">0,00€</span></p><p>Entrez le montant exact que le client vous a donné :</p><div class="input-group"><input type="number" id="given-money-input" step="0.01" min="0" placeholder="0.00"><span>€</span></div><div><button id="confirm-cash-in-button">Confirmer</button><button id="exact-amount-button" style="background-color: #17a2b8;">Montant Exact</button><button id="cancel-cash-in-button">Annuler</button></div><p style="font-size: 0.9em; color: #777; margin-top: 15px;">Soyez attentif, ce montant influence votre rendu de monnaie !</p>`;
                 document.getElementById('large-bill-dialog').innerHTML = `<h3>Choisir un Gros Billet</h3><div id="large-bill-buttons"></div><button id="close-large-bill-button" style="background-color: #6c757d; margin-top: 15px;">Fermer</button>`;
                 document.getElementById('pause-dialog').innerHTML = `<h3>Jeu en Pause</h3><div id="pause-sound-controls"><h4>Options Sonores</h4><div class="sound-control-group"><label for="music-volume-pause">Volume Musique</label><input type="range" id="music-volume-pause" class="volume-slider" min="0" max="1" step="0.1"></div><div class="sound-control-group"><label for="ambiance-volume-pause">Volume Ambiance</label><input type="range" id="ambiance-volume-pause" class="volume-slider" min="0" max="1" step="0.1"></div><div class="sound-control-group"><label for="effects-volume-pause">Volume Effets Sonores</label><input type="range" id="effects-volume-pause" class="volume-slider" min="0" max="1" step="0.1"></div></div><div style="margin-top: 20px;"><button id="resume-button">Reprendre le jeu</button><button id="restart-from-pause-button">Redémarrer la journée</button></div>`;
+                rankDialog = document.getElementById('rank-dialog');
+                document.getElementById('rank-up-dialog').innerHTML = `<h2 class="rank-up-title">🎉 Promotion ! 🎉</h2><p>Félicitations ! Vous avez été promu au rang de :</p><h3 id="new-rank-name-display">Caissier</h3><div id="points-to-next-rank-display"></div><button id="close-rank-up-modal-button" style="margin-top:20px;">Continuer</button>`;
             }
             populateModals();
 
@@ -479,6 +550,10 @@
                 musicVolumeSlider = document.getElementById('music-volume');
                 ambianceVolumeSlider = document.getElementById('ambiance-volume');
                 effectsVolumeSlider = document.getElementById('effects-volume');
+                rankUpDialog = document.getElementById('rank-up-dialog');
+                newRankNameDisplay = document.getElementById('new-rank-name-display');
+                pointsToNextRankDisplay = document.getElementById('points-to-next-rank-display');
+                closeRankUpModalButton = document.getElementById('close-rank-up-modal-button');
             }
             assignModalElements();
             
@@ -505,9 +580,29 @@
         updateReturnedMoneyDisplay = function() { returnedMoneyDisplay.innerHTML = ''; const e = [...returnedCurrencyList].sort((e, t) => t - e); e.forEach(e => { const t = CURRENCIES.find(t => t.value === e); if (t) { const r = document.createElement("div"); r.className = "returned-item-wrapper"; const n = document.createElement("img"); n.src = t.img, n.alt = t.label, n.className = `currency-img ${t.type}`, r.appendChild(n), r.onclick = t => { t.stopPropagation(); const r = returnedCurrencyList.indexOf(e); -1 !== r && removeReturnedMoney(r) }, returnedMoneyDisplay.appendChild(r) } }) }
         checkRefillNecessity=function(){if(!canRefill||["hard","extreme"].includes(currentDifficulty)||clientsServedToday<=1)return;const e=CURRENCIES.some(c=>c.value>=.05&&(cashRegister[c.value]||0)<REFILL_THRESHOLD);e&&(showModal(refillOverlay),canRefill=!1,clearTimeout(refillCooldownTimer),refillCooldownTimer=setTimeout(()=>{canRefill=!0},3e5))}
         performRefill=function(amount, isEmergency = false){CURRENCIES.forEach(currency => {const currentStock = cashRegister[currency.value] || 0;if (isEmergency || currentStock < REFILL_UPPER_THRESHOLD) {cashRegister[currency.value] = currentStock + amount; const valueAdded = currency.value * amount; theoreticalCashTotal = parseFloat((theoreticalCashTotal + valueAdded).toFixed(2)); actualCashTotal = parseFloat((actualCashTotal + valueAdded).toFixed(2));}});updateCashDrawer();}
-        initializeCashRegister = function(isNewGame = false) { if (isNewGame) { cashRegister = {}; theoreticalCashTotal = 0; actualCashTotal = 0; const initialStock = DIFFICULTY_SETTINGS[currentDifficulty].stock; CURRENCIES.forEach(currency => { const amount = initialStock[currency.value] || 0; cashRegister[currency.value] = amount; const initialValue = currency.value * amount; theoreticalCashTotal = parseFloat((theoreticalCashTotal + initialValue).toFixed(2)); actualCashTotal = parseFloat((actualCashTotal + initialValue).toFixed(2)); }); } dailyErrors = []; updateCashDrawer(); currentDayEl.textContent = currentDay; totalClientsDayEl.textContent = CLIENTS_PER_DAY; }
+        initializeCashRegister = function(isNewGame = false) { 
+            if (isNewGame) { 
+                cashRegister = {}; 
+                theoreticalCashTotal = 0; 
+                actualCashTotal = 0; 
+                cumulativeScore = 0;
+                updateRank(true); // isNewGame flag to prevent initial message
+                const initialStock = DIFFICULTY_SETTINGS[currentDifficulty].stock; 
+                CURRENCIES.forEach(currency => { 
+                    const amount = initialStock[currency.value] || 0; 
+                    cashRegister[currency.value] = amount; 
+                    const initialValue = currency.value * amount; 
+                    theoreticalCashTotal = parseFloat((theoreticalCashTotal + initialValue).toFixed(2)); 
+                    actualCashTotal = parseFloat((actualCashTotal + initialValue).toFixed(2)); 
+                }); 
+            } 
+            dailyErrors = []; 
+            updateCashDrawer(); 
+            currentDayEl.textContent = currentDay; 
+            totalClientsDayEl.textContent = CLIENTS_PER_DAY; 
+        }
         generateAmountToPay=function(){if(lastAmountToPay>0&&Math.random()<.15)return lastAmountToPay;const e=[{min:.5,max:10,weight:.4},{min:10.01,max:50,weight:.45},{min:50.01,max:150,weight:.12},{min:150.01,max:400,weight:.03}];let t=null,a=Math.random(),n=0;for(const l of e){if(n+=l.weight,a<n){t=l;break}}t||(t=e[0]);let r=Math.random()*(t.max-t.min)+t.min,o=Math.random();return o<.25?r=Math.floor(r)+[.99,.95][Math.floor(2*Math.random())]:o<.5&&(r=Math.floor(r)+[0,.5][Math.floor(2*Math.random())]),parseFloat(r.toFixed(2))}
-        generateClientPayment=function(t,{forceSufficient:e=!1,forceDifferent:a=!1}={}){const n=CURRENCIES.filter(c=>!(c.value>4*t&&c.value>50)&&!(c.value>=200&&t<c.value/3));let r=[{type:"standard",func:createStandardPayment,weight:35},{type:"exact",func:createExactPayment,weight:15},{type:"smart",func:createSmartPayment,weight:15},{type:"allCoins",func:createAllCoinsPayment,weight:10},{type:"insufficient",func:createInsufficientPayment,weight:10},{type:"almostExact",func:createAlmostExactPayment,weight:5},{type:"largeBillSmallPurchase",func:createLargeBillPayment,weight:10}];(e||"easy"===currentDifficulty)&&(r.find(c=>"insufficient"===c.type).weight=0,r.find(c=>"almostExact"===c.type).weight=0),("hard"===currentDifficulty||"extreme"===currentDifficulty)&&(r.find(c=>"almostExact"===c.type).weight+=10),t>20&&(r.find(c=>"largeBillSmallPurchase"===c.type).weight=0,r.find(c=>"allCoins"===c.type).weight=0),t<5&&(r.find(c=>"largeBillSmallPurchase"===c.type).weight+=10),a&&((c=r.find(c=>c.type===lastPaymentType))&& (c.weight=0));const o=r.reduce((c,e)=>c+e.weight,0);let l=Math.random()*o,u=r[r.length-1];for(const c of r){if(l<c.weight){u=c;break}l-=c.weight}let i=u.func(t,n);return e&&i.amount<t&&(i=createStandardPayment(t,n)),(0===i.amount||"insufficient"===u.type&&i.amount>=t)&&(i=createStandardPayment(t,n)),i.type=u.type,i;var c}
+        generateClientPayment=function(t,{forceSufficient:e=!1,forceDifferent:a=!1}={}){ const n=CURRENCIES.filter(c=>!(c.value>4*t&&c.value>50)&&!(c.value>=200&&t<c.value/3)); let r=[ {type:"standard",func:createStandardPayment,weight:35}, {type:"exact",func:createExactPayment,weight:15}, {type:"smart",func:createSmartPayment,weight:15}, {type:"allCoins",func:createAllCoinsPayment,weight:10}, {type:"insufficient",func:createInsufficientPayment,weight:10}, {type:"almostExact",func:createAlmostExactPayment,weight:5}, {type:"largeBillSmallPurchase",func:createLargeBillPayment,weight:10} ]; const dayFactor = Math.min((currentDay - 1) * 0.05, 0.5); const findP = (type) => r.find(p => p.type === type); if(findP('exact')) findP('exact').weight *= (1 - dayFactor); if(findP('insufficient')) findP('insufficient').weight *= (1 + dayFactor * 2); if(findP('almostExact')) findP('almostExact').weight *= (1 + dayFactor * 1.5); (e||"easy"===currentDifficulty)&&(findP("insufficient").weight=0,findP("almostExact").weight=0),("hard"===currentDifficulty||"extreme"===currentDifficulty)&&(findP("almostExact").weight+=10),t>20&&(findP("largeBillSmallPurchase").weight=0,findP("allCoins").weight=0),t<5&&(findP("largeBillSmallPurchase").weight+=10),a&&((c=findP(lastPaymentType))&& (c.weight=0)); const o=r.reduce((c,e)=>c+e.weight,0);let l=Math.random()*o,u=r[r.length-1];for(const c of r){if(l<c.weight){u=c;break}l-=c.weight}let i=u.func(t,n);return e&&i.amount<t&&(i=createStandardPayment(t,n)),(0===i.amount||"insufficient"===u.type&&i.amount>=t)&&(i=createStandardPayment(t,n)),i.type=u.type,i;var c }
         createStandardPayment=function(t,e){let a=[];const n=[...e].sort((c,e)=>c.value-e.value).find(c=>c.value>=t);if(n&&Math.random()<.7)a.push(n);else{let c=t;for(const o of e)if(a.length<8&&c>.5*o.value&&Math.random()>.3&&(a.push(o),c-=o.value,a.reduce((c,e)=>c+e.value,0)>=t))break;let r=a.reduce((c,e)=>c+e.value,0);if(r<t){const i=t-r,s=[...e].sort((c,e)=>c.value-e.value).find(c=>c.value>=i);s&&a.push(s)}}return 0===a.length&&((l=[...e].sort((c,e)=>c.value-e.value).find(c=>c.value>=t))?a.push(l):e.length>0&&a.push(e[0])),{currencies:a,amount:parseFloat(a.reduce((c,e)=>c+e.value,0).toFixed(2))};var l}
         createExactPayment=function(t,e){let a=t,n=[];for(const r of e)for(;a>=r.value&&a>.001;)n.push(r),a=parseFloat((a-r.value).toFixed(2));return a>.001?createStandardPayment(t,e):{currencies:n,amount:t}}
         createSmartPayment=function(t,e){const a=createStandardPayment(t,e),n=a.amount-t;if(n>0&&"00"!==n.toFixed(2).slice(-2)&&"0"!==n.toFixed(2).slice(-1)){const r=parseFloat((.1*Math.ceil(10*n)-n).toFixed(2)),o=e.find(c=>c.value===r);o&&(a.currencies.push(o),a.amount=parseFloat((a.amount+o.value).toFixed(2)))}return a}
@@ -515,184 +610,25 @@
         createAllCoinsPayment=function(t,e){let a=[],n=0;const r=e.filter(c=>"coin"===c.type).sort((c,e)=>c.value-e.value);for(;n<t&&a.length<15&&r.length>0;){let c=r.pop();a.push(c),n=parseFloat((n+c.value).toFixed(2))}return n<t?createStandardPayment(t,e):{currencies:a,amount:n}}
         createAlmostExactPayment=function(t,e){let a=createExactPayment(t,e);if(a.amount!==t||a.currencies.length<2)return createStandardPayment(t,e);const n=Math.floor(Math.random()*a.currencies.length),r=a.currencies[n],o=e.filter(c=>c.type===r.type&&Math.abs(c.value-r.value)>.001&&Math.abs(c.value-r.value)<.5);return o.length>0?a.currencies[n]=o[Math.floor(Math.random()*o.length)]:createStandardPayment(t,e),{currencies:a.currencies,amount:parseFloat(a.currencies.reduce((c,e)=>c+e.value,0).toFixed(2))}}
         createLargeBillPayment=function(t,e){const a=e.filter(c=>c.value>=20&&c.value>3*t);return a.length>0?{currencies:[a[Math.floor(Math.random()*a.length)]],amount:a[Math.floor(Math.random()*a.length)].value}:createStandardPayment(t,e)}
-        displayClientPayment=function(c){clientPaymentDisplay.innerHTML="";let e=[...c.currencies];Math.random()<.33?e.sort(()=>.5-Math.random()):e.sort((c,e)=>e.value-c.value),e.forEach(c=>{const e=document.createElement("img");e.src=c.img,e.alt=c.label,e.className=`currency-img ${c.type}`,clientPaymentDisplay.appendChild(e)}),clientGivenMoney=c.amount}
-        startNewClient=function(){if(clientsServedToday>=CLIENTS_PER_DAY){stopTimer(),endOfDaySummary();return}resetForNextClient(),clientsServedToday++,currentClientEl.textContent=clientsServedToday,setTimeout(()=>{const c=Math.floor(12*Math.random())+1;customerImage.src=`images/client-${c}.png`,customerImage.style.display="block",setTimeout(()=>{customerImage.style.opacity="1"},50)},600);const c=generateAmountToPay(),e=c===lastAmountToPay;lastAmountToPay=c,currentAmountToPay=c,amountToPayEl.textContent=formatCurrency(currentAmountToPay);const t=generateClientPayment(currentAmountToPay,{forceDifferent:e});lastPaymentType=t.type,displayClientPayment(t),updateCashDrawer(),checkRefillNecessity(),timeLeft=DIFFICULTY_SETTINGS[currentDifficulty].time,startTimer()}
+        displayClientPayment=function(c){ clientPaymentDisplay.innerHTML=""; let e=[...c.currencies]; const disorderChance = Math.min(0.33 + (currentDay - 1) * 0.05, 0.9); if(Math.random() < disorderChance) { e.sort(()=>.5-Math.random()); } else { e.sort((c,e)=>e.value-c.value); } e.forEach(c=>{const e=document.createElement("img");e.src=c.img,e.alt=c.label,e.className=`currency-img ${c.type}`,clientPaymentDisplay.appendChild(e)}),clientGivenMoney=c.amount }
+        startNewClient=function(){ if(clientsServedToday>=CLIENTS_PER_DAY){stopTimer(),endOfDaySummary();return} resetForNextClient(),clientsServedToday++,currentClientEl.textContent=clientsServedToday,setTimeout(()=>{const c=Math.floor(12*Math.random())+1;customerImage.src=`images/client-${c}.png`,customerImage.style.display="block",setTimeout(()=>{customerImage.style.opacity="1"},50)},600); const c=generateAmountToPay(),e=c===lastAmountToPay;lastAmountToPay=c,currentAmountToPay=c,amountToPayEl.textContent=formatCurrency(currentAmountToPay); const t=generateClientPayment(currentAmountToPay,{forceDifferent:e});lastPaymentType=t.type,displayClientPayment(t),updateCashDrawer(),checkRefillNecessity(); const baseTime = DIFFICULTY_SETTINGS[currentDifficulty].time; const timeReduction = Math.floor((currentDay - 1) * 0.5); timeLeft = Math.max(baseTime - timeReduction, 15); startTimer() }
         handleInsufficientPayment=function(){if(clientGivenMoney>=currentAmountToPay){showMessage("Erreur de jugement. Le paiement du client est suffisant.","info");return}const c=SCORING.VIGILANCE_BONUS*SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty];dailyScore+=c,dailyAccuracyBonus+=c,currentScoreEl.textContent=dailyScore,showMessage("Bien vu ! Le client s'excuse et corrige son paiement.","success",4e3),playSound("sound-piece");const e=generateClientPayment(currentAmountToPay,{forceSufficient:!0});displayClientPayment(e)}
         handleCashIn=function(){stopTimer(),modalAmountToPayEl.textContent=formatCurrency(currentAmountToPay),givenMoneyInput.value="",showModal(cashInModal)}
-        
-        confirmCashIn = function() {
-            userEnteredGivenMoney = parseFloat(givenMoneyInput.value);
-            if (isNaN(userEnteredGivenMoney) || userEnteredGivenMoney < 0) {
-                showMessage("Veuillez entrer un montant valide.", "error");
-                startTimer();
-                return;
-            }
-            
-            actualCashTotal = parseFloat((actualCashTotal + clientGivenMoney).toFixed(2));
-            correctChangeNeeded = parseFloat((clientGivenMoney - currentAmountToPay).toFixed(2));
-            userChangeNeeded = parseFloat((userEnteredGivenMoney - currentAmountToPay).toFixed(2));
-            
-            amountToReturnEl.textContent = formatCurrency(Math.max(0, userChangeNeeded));
-            hideModal(cashInModal);
-            cashInButton.style.display = 'none';
-            notEnoughButton.style.display = 'none';
-            validateButton.style.display = 'inline-block';
-            emergencyRefillButton.style.display = 'inline-block';
-            nextClientButton.style.display = 'none';
-            validateButton.disabled = false;
-            changeDisplayLine.classList.add('editable');
-            updateCashDrawer();
-            startTimer();
-        }
-
+        confirmCashIn = function() { userEnteredGivenMoney = parseFloat(givenMoneyInput.value); if (isNaN(userEnteredGivenMoney) || userEnteredGivenMoney < 0) { showMessage("Veuillez entrer un montant valide.", "error"); startTimer(); return; } actualCashTotal = parseFloat((actualCashTotal + clientGivenMoney).toFixed(2)); correctChangeNeeded = parseFloat((clientGivenMoney - currentAmountToPay).toFixed(2)); userChangeNeeded = parseFloat((userEnteredGivenMoney - currentAmountToPay).toFixed(2)); amountToReturnEl.textContent = formatCurrency(Math.max(0, userChangeNeeded)); hideModal(cashInModal); cashInButton.style.display = 'none'; notEnoughButton.style.display = 'none'; validateButton.style.display = 'inline-block'; emergencyRefillButton.style.display = 'inline-block'; nextClientButton.style.display = 'none'; validateButton.disabled = false; changeDisplayLine.classList.add('editable'); updateCashDrawer(); startTimer(); }
         cancelCashIn = function() { hideModal(cashInModal); givenMoneyInput.value = ''; startTimer(); }
-        
-        reEnterAmount = function() {
-            if (validateButton.style.display === 'none') return;
-            stopTimer();
-
-            actualCashTotal = parseFloat((actualCashTotal - clientGivenMoney).toFixed(2));
-            
-            returnedCurrencyList.forEach(value => {
-                cashRegister[value]++;
-                actualCashTotal = parseFloat((actualCashTotal + value).toFixed(2));
-            });
-            currentReturnedMoney = 0;
-            returnedCurrencyList = [];
-            
-            updateReturnedMoneyDisplay();
-            updateCashDrawer();
-            amountToReturnEl.textContent = formatCurrency(0);
-            changeDisplayLine.classList.remove('editable');
-            validateButton.style.display = 'none';
-            emergencyRefillButton.style.display = 'none';
-            cashInButton.style.display = 'inline-block';
-            notEnoughButton.style.display = 'inline-block';
-            
-            modalAmountToPayEl.textContent = formatCurrency(currentAmountToPay);
-            givenMoneyInput.value = userEnteredGivenMoney > 0 ? userEnteredGivenMoney.toFixed(2) : '';
-            showModal(cashInModal);
-        }
-
+        reEnterAmount = function() { if (validateButton.style.display === 'none') return; stopTimer(); actualCashTotal = parseFloat((actualCashTotal - clientGivenMoney).toFixed(2)); returnedCurrencyList.forEach(value => { cashRegister[value]++; actualCashTotal = parseFloat((actualCashTotal + value).toFixed(2)); }); currentReturnedMoney = 0; returnedCurrencyList = []; updateReturnedMoneyDisplay(); updateCashDrawer(); amountToReturnEl.textContent = formatCurrency(0); changeDisplayLine.classList.remove('editable'); validateButton.style.display = 'none'; emergencyRefillButton.style.display = 'none'; cashInButton.style.display = 'inline-block'; notEnoughButton.style.display = 'inline-block'; modalAmountToPayEl.textContent = formatCurrency(currentAmountToPay); givenMoneyInput.value = userEnteredGivenMoney > 0 ? userEnteredGivenMoney.toFixed(2) : ''; showModal(cashInModal); }
         handleExactAmountClick = function() { if (givenMoneyInput) { givenMoneyInput.value = currentAmountToPay.toFixed(2); confirmCashInButton.focus(); } }
         addReturnedMoney = function(value) { if (isPaused) return; const currency = CURRENCIES.find(c => c.value === value); if (!currency) return; if ((cashRegister[value] || 0) <= 0) { showMessage(`Vous n'avez plus de ${currency.label} en caisse !`, 'error'); return; } if(currency.type === 'bill') playSound('sound-billet'); else playSound('sound-piece'); cashRegister[value]--; actualCashTotal = parseFloat((actualCashTotal - value).toFixed(2)); returnedCurrencyList.push(value); currentReturnedMoney = parseFloat((currentReturnedMoney + value).toFixed(2)); updateReturnedMoneyDisplay(); updateCashDrawer(); }
         removeReturnedMoney = function(indexToRemove) { if (isPaused) return; if (indexToRemove === undefined || indexToRemove < 0 || indexToRemove >= returnedCurrencyList.length) return; const removedValue = returnedCurrencyList.splice(indexToRemove, 1)[0]; const currency = CURRENCIES.find(c => c.value === removedValue); if(currency.type === 'bill') playSound('sound-billet'); else playSound('sound-piece'); cashRegister[removedValue]++; actualCashTotal = parseFloat((actualCashTotal + removedValue).toFixed(2)); currentReturnedMoney = parseFloat((currentReturnedMoney - removedValue).toFixed(2)); updateReturnedMoneyDisplay(); updateCashDrawer(); }
-        
-        validateChange = function() {
-            stopTimer();
-            playSound('sound-caisse');
-            validateButton.disabled = true;
-            changeDisplayLine.classList.remove('editable');
-            emergencyRefillButton.style.display = 'none';
-
-            let clientScore = SCORING.BASE_PER_CLIENT;
-            let hasError = false;
-
-            if (timeLeft > 0) {
-                const timeBonus = timeLeft * SCORING.TIME_BONUS_MULTIPLIER;
-                clientScore += timeBonus;
-                dailyTimeBonus += timeBonus;
-            }
-            
-            theoreticalCashTotal = parseFloat((theoreticalCashTotal + currentAmountToPay).toFixed(2));
-            
-            if (Math.abs(userEnteredGivenMoney - clientGivenMoney) > 0.001) {
-                hasError = true;
-                clientScore -= SCORING.PENALTY_CASH_IN_ERROR;
-                dailyErrorPenalty += SCORING.PENALTY_CASH_IN_ERROR;
-                dailyErrors.push({type: 'encaissement', client: clientsServedToday, clientGave: clientGivenMoney, userEntered: userEnteredGivenMoney });
-            }
-            if (Math.abs(currentReturnedMoney - correctChangeNeeded) > 0.001) {
-                hasError = true;
-                clientScore -= SCORING.PENALTY_CHANGE_ERROR;
-                dailyErrorPenalty += SCORING.PENALTY_CHANGE_ERROR;
-                dailyErrors.push({type: 'rendu', client: clientsServedToday, expected: correctChangeNeeded, returned: currentReturnedMoney, returnedItems: [...returnedCurrencyList]});
-            }
-            if (!hasError) {
-                clientScore += SCORING.ACCURACY_BONUS;
-                dailyAccuracyBonus += SCORING.ACCURACY_BONUS;
-            }
-            
-            clientScore *= SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty];
-            dailyScore += Math.round(clientScore);
-            currentScoreEl.textContent = dailyScore;
-            nextClientButton.style.display = 'inline-block';
-            pauseButton.disabled = true;
-        }
-        
-        endOfDaySummary = function() { 
-            customerImage.style.opacity = '0'; setTimeout(() => { customerImage.style.display = 'none'; }, 500); soundFoule.pause(); 
-            const totalErrorPenalty = dailyErrorPenalty + dailyOvertimePenalty;
-            const finalScore = dailyScore - dailyOvertimePenalty;
-            saveHighScore(finalScore); 
-            summaryBaseScoreEl.textContent = clientsServedToday * SCORING.BASE_PER_CLIENT; 
-            summaryTimeBonusEl.textContent = Math.round(dailyTimeBonus); 
-            summaryAccuracyBonusEl.textContent = dailyAccuracyBonus; 
-            summaryErrorPenaltyEl.textContent = -totalErrorPenalty; 
-            summaryFinalScoreEl.textContent = finalScore; 
-
-            if (dailyOvertimePenalty > 0) { dailyErrors.push({ type: 'temps_depasse', details: `Vous avez accumulé une pénalité de ${dailyOvertimePenalty} points pour temps dépassé.` }); }
-
-            const actualCents = Math.round(actualCashTotal * 100);
-            const theoreticalCents = Math.round(theoreticalCashTotal * 100);
-            const difference = (actualCents - theoreticalCents) / 100;
-            
-            summaryDifference.textContent = formatCurrency(Math.abs(difference)); 
-            if (Math.abs(difference) < 0.001) { 
-                playSound('sound-victoire'); 
-                summaryDifference.classList.remove('error-message'); 
-                summaryDifference.classList.add('success-message'); 
-                summaryDifference.textContent += ' (Caisse juste !)'; 
-            } else { 
-                playSound('sound-echec'); 
-                summaryDifference.classList.remove('success-message'); 
-                summaryDifference.classList.add('error-message'); 
-                summaryDifference.textContent += difference > 0 ? ' (Excédent)' : ' (Manquant)'; 
-                dailyErrors.push({ type: 'difference_caisse', details: `La caisse présente un ${difference > 0 ? 'excédent' : 'manquant'} de ${formatCurrency(Math.abs(difference))}.` }); 
-            } 
-            
-            errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3>'; 
-            if (dailyErrors.length > 0) { 
-                errorLogContainer.style.display = 'block'; 
-                dailyErrors.forEach(err => { 
-                    const entry = document.createElement('div'); entry.className = 'error-entry'; 
-                    if (err.type === 'encaissement') entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur d'encaissement</div><div class="error-details">Le client a donné <span>${formatCurrency(err.clientGave)}</span>, vous avez saisi <span>${formatCurrency(err.userEntered)}</span>.</div>`; 
-                    else if (err.type === 'rendu') { const r = err.returnedItems.reduce((a,v)=>{a[v]=(a[v]||0)+1;return a},{}); const s=Object.entries(r).map(([v,c])=>`${c}x ${CURRENCIES.find(i=>i.value==v).label}`).join(', '); entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur de rendu</div><div class="error-details">Rendu attendu : <span>${formatCurrency(err.expected)}</span>. Vous avez rendu : <span>${formatCurrency(err.returned)}</span>.<br>Détail : ${s||'rien'}</div>`;} 
-                    else if (err.type === 'temps_depasse') entry.innerHTML = `<div class="error-title">Pénalité de Temps</div><div class="error-details">${err.details}</div>`; 
-                    else if (err.type === 'difference_caisse') entry.innerHTML = `<div class="error-title">Erreur de Caisse</div><div class="error-details">${err.details}</div>`; 
-                    errorLogContainer.appendChild(entry); }); 
-            } else { errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3><div class="error-entry">Aucune erreur, félicitations !</div>'; errorLogContainer.style.display = 'block'; } 
-            showModal(summaryModal); 
-        }
-
-        // --- CORRECTION APPLIQUÉE ICI ---
-        startNextDay = function() {
-            hideModal(summaryModal);
-            clientsServedToday = 0;
-            dailyScore = 0;
-            dailyTimeBonus = 0;
-            dailyAccuracyBonus = 0;
-            dailyErrorPenalty = 0;
-            dailyOvertimePenalty = 0;
-            currentScoreEl.textContent = '0';
-            currentDay++;
-
-            // Cette ligne est la clé. Elle resynchronise la caisse théorique avec la caisse réelle.
-            // L'état de la caisse à la fin de la journée devient le point de départ correct pour la nouvelle journée.
-            theoreticalCashTotal = actualCashTotal;
-
-            initializeCashRegister(false);
-            saveGameState();
-            if (!isMuted) soundFoule.play().catch(e => {});
-            startNewClient();
-        }
-
+        validateChange = function() { stopTimer(); playSound('sound-caisse'); validateButton.disabled = true; changeDisplayLine.classList.remove('editable'); emergencyRefillButton.style.display = 'none'; let clientScore = SCORING.BASE_PER_CLIENT; let hasError = false; if (timeLeft > 0) { const timeBonus = timeLeft * SCORING.TIME_BONUS_MULTIPLIER; clientScore += timeBonus; dailyTimeBonus += timeBonus; } theoreticalCashTotal = parseFloat((theoreticalCashTotal + currentAmountToPay).toFixed(2)); if (Math.abs(userEnteredGivenMoney - clientGivenMoney) > 0.001) { hasError = true; clientScore -= SCORING.PENALTY_CASH_IN_ERROR; dailyErrorPenalty += SCORING.PENALTY_CASH_IN_ERROR; dailyErrors.push({type: 'encaissement', client: clientsServedToday, clientGave: clientGivenMoney, userEntered: userEnteredGivenMoney }); } if (Math.abs(currentReturnedMoney - correctChangeNeeded) > 0.001) { hasError = true; clientScore -= SCORING.PENALTY_CHANGE_ERROR; dailyErrorPenalty += SCORING.PENALTY_CHANGE_ERROR; dailyErrors.push({type: 'rendu', client: clientsServedToday, expected: correctChangeNeeded, returned: currentReturnedMoney, returnedItems: [...returnedCurrencyList]}); } if (!hasError) { clientScore += SCORING.ACCURACY_BONUS; dailyAccuracyBonus += SCORING.ACCURACY_BONUS; } clientScore *= SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty]; dailyScore += Math.round(clientScore); currentScoreEl.textContent = dailyScore; nextClientButton.style.display = 'inline-block'; pauseButton.disabled = true; }
+        endOfDaySummary = function() { customerImage.style.opacity = '0'; setTimeout(() => { customerImage.style.display = 'none'; }, 500); soundFoule.pause(); const totalErrorPenalty = dailyErrorPenalty + dailyOvertimePenalty; const finalScore = dailyScore - dailyOvertimePenalty; cumulativeScore += finalScore; updateRank(); saveHighScore(finalScore); summaryBaseScoreEl.textContent = clientsServedToday * SCORING.BASE_PER_CLIENT; summaryTimeBonusEl.textContent = Math.round(dailyTimeBonus); summaryAccuracyBonusEl.textContent = dailyAccuracyBonus; summaryErrorPenaltyEl.textContent = -totalErrorPenalty; summaryFinalScoreEl.textContent = finalScore; if (dailyOvertimePenalty > 0) { dailyErrors.push({ type: 'temps_depasse', details: `Vous avez accumulé une pénalité de ${dailyOvertimePenalty} points pour temps dépassé.` }); } const actualCents = Math.round(actualCashTotal * 100); const theoreticalCents = Math.round(theoreticalCashTotal * 100); const difference = (actualCents - theoreticalCents) / 100; summaryDifference.textContent = formatCurrency(Math.abs(difference)); if (Math.abs(difference) < 0.001) { playSound('sound-victoire'); summaryDifference.classList.remove('error-message'); summaryDifference.classList.add('success-message'); summaryDifference.textContent += ' (Caisse juste !)'; } else { playSound('sound-echec'); summaryDifference.classList.remove('success-message'); summaryDifference.classList.add('error-message'); summaryDifference.textContent += difference > 0 ? ' (Excédent)' : ' (Manquant)'; dailyErrors.push({ type: 'difference_caisse', details: `La caisse présente un ${difference > 0 ? 'excédent' : 'manquant'} de ${formatCurrency(Math.abs(difference))}.` }); } errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3>'; if (dailyErrors.length > 0) { errorLogContainer.style.display = 'block'; dailyErrors.forEach(err => { const entry = document.createElement('div'); entry.className = 'error-entry'; if (err.type === 'encaissement') entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur d'encaissement</div><div class="error-details">Le client a donné <span>${formatCurrency(err.clientGave)}</span>, vous avez saisi <span>${formatCurrency(err.userEntered)}</span>.</div>`; else if (err.type === 'rendu') { const r = err.returnedItems.reduce((a,v)=>{a[v]=(a[v]||0)+1;return a},{}); const s=Object.entries(r).map(([v,c])=>`${c}x ${CURRENCIES.find(i=>i.value==v).label}`).join(', '); entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur de rendu</div><div class="error-details">Rendu attendu : <span>${formatCurrency(err.expected)}</span>. Vous avez rendu : <span>${formatCurrency(err.returned)}</span>.<br>Détail : ${s||'rien'}</div>`;} else if (err.type === 'temps_depasse') entry.innerHTML = `<div class="error-title">Pénalité de Temps</div><div class="error-details">${err.details}</div>`; else if (err.type === 'difference_caisse') entry.innerHTML = `<div class="error-title">Erreur de Caisse</div><div class="error-details">${err.details}</div>`; errorLogContainer.appendChild(entry); }); } else { errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3><div class="error-entry">Aucune erreur, félicitations !</div>'; errorLogContainer.style.display = 'block'; } showModal(summaryModal); }
+        startNextDay = function() { hideModal(summaryModal); clientsServedToday = 0; dailyScore = 0; dailyTimeBonus = 0; dailyAccuracyBonus = 0; dailyErrorPenalty = 0; dailyOvertimePenalty = 0; currentScoreEl.textContent = '0'; currentDay++; theoreticalCashTotal = actualCashTotal; initializeCashRegister(false); saveGameState(); if (!isMuted) soundFoule.play().catch(e => {}); startNewClient(); }
         startTimer = function() { if (timerInterval) return; timerInterval = setInterval(() => { if (isPaused) return; timeLeft--; if (timeLeft < 0) { dailyOvertimePenalty += SCORING.PENALTY_OVERTIME_PER_SECOND; if (timeLeft === -1) { showMessage("Temps dépassé ! Chaque seconde ajoute une pénalité.", "info", 2500); playSound('sound-echec'); } } updateTimerDisplay(); }, 1000); }
         stopTimer = function() { clearInterval(timerInterval); timerInterval = null; }
         updateTimerDisplay = function() { const i = timeLeft < 0; const r = Math.abs(timeLeft); const m = Math.floor(r / 60); const s = r % 60; timerDisplay.textContent = `${i?'-':''}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; timerDisplay.classList.toggle('low-time', timeLeft <= 10 && !i); }
         pauseGame = function() { if (isPaused) return; isPaused = true; stopTimer(); updateCashDrawer(); showModal(pauseModal); }
-        resumeGame = function() { if (!isPaused) return; isPaused = false; hideModal(pauseModal); startTimer(); updateCashDrawer(); }
-        handlePauseToggle = function() { if (difficultySelection.classList.contains('active') || summaryModal.classList.contains('active')) return; if(isPaused) resumeGame(); else pauseGame(); }
+        resumeGame = function() { if (!isPaused) return; isPaused = false; hideModal(pauseModal); hideModal(rankModal); startTimer(); updateCashDrawer(); }
+        handlePauseToggle = function() { if (difficultySelection.classList.contains('active') || summaryModal.classList.contains('active') || rankModal.classList.contains('active')) return; if(isPaused) resumeGame(); else pauseGame(); }
         resetGameToDifficultySelection = function() { stopTimer(); isPaused = false; clientsServedToday = 0; dailyScore = 0; dailyTimeBonus = 0; dailyAccuracyBonus = 0; dailyErrorPenalty = 0; dailyOvertimePenalty = 0; currentScoreEl.textContent = '0'; currentDay = 1; lastAmountToPay = 0; lastPaymentType = null; canRefill = true; clearTimeout(refillCooldownTimer); localStorage.removeItem('cashier_save_state'); hideModal(pauseModal); hideModal(summaryModal); showModal(difficultySelection); }
         startGame = function(difficulty) { currentDifficulty = difficulty; hideModal(difficultySelection); gameContainer.style.display = 'flex'; initializeCashRegister(true); if (!isMuted) { soundMusique.play().catch(e => {}); soundFoule.play().catch(e => {}); } saveGameState(); startNewClient(); }
         toggleMute = function() { isMuted = !isMuted; soundMusique.muted = isMuted; soundFoule.muted = isMuted; effectSounds.forEach(s=>s.muted=isMuted); iconSoundOn.style.display = isMuted ? 'none' : 'block'; iconSoundOff.style.display = isMuted ? 'block' : 'none'; }
@@ -700,11 +636,59 @@
         updateAmbianceVolume = function(v) { const n=parseFloat(v); ambianceVolume=n; soundFoule.volume=n; if(ambianceVolumeSlider)ambianceVolumeSlider.value=n; if(ambianceVolumeSliderPause)ambianceVolumeSliderPause.value=n; }
         updateEffectsVolume = function(v) { const n=parseFloat(v); effectsVolume=n; if(effectsVolumeSlider)effectsVolumeSlider.value=n; if(effectsVolumeSliderPause)effectsVolumeSliderPause.value=n; }
         initializeSoundControls = function() { updateMusicVolume(musicVolume); updateAmbianceVolume(ambianceVolume); updateEffectsVolume(effectsVolume); }
-        saveGameState = function() { const s = { currentDay, dailyScore, cashRegister, theoreticalCashTotal, actualCashTotal, currentDifficulty }; localStorage.setItem('cashier_save_state', JSON.stringify(s)); }
-        loadGameState = function() { const s = JSON.parse(localStorage.getItem('cashier_save_state')); if (!s) return false; currentDay = s.currentDay; dailyScore = s.dailyScore; cashRegister = s.cashRegister; theoreticalCashTotal = s.theoreticalCashTotal; actualCashTotal = s.actualCashTotal; currentDifficulty = s.currentDifficulty; currentScoreEl.textContent = dailyScore; hideModal(continueModal); gameContainer.style.display = 'flex'; if (!isMuted) { soundMusique.play().catch(e => {}); soundFoule.play().catch(e => {}); } initializeCashRegister(false); startNewClient(); return true; }
+        saveGameState = function() { const s = { currentDay, cashRegister, theoreticalCashTotal, actualCashTotal, currentDifficulty, cumulativeScore, currentRank }; localStorage.setItem('cashier_save_state', JSON.stringify(s)); }
+        loadGameState = function() { const s = JSON.parse(localStorage.getItem('cashier_save_state')); if (!s) return false; currentDay = s.currentDay; cashRegister = s.cashRegister; theoreticalCashTotal = s.theoreticalCashTotal; actualCashTotal = s.actualCashTotal; currentDifficulty = s.currentDifficulty; cumulativeScore = s.cumulativeScore || 0; currentRank = s.currentRank || RANKS[0]; currentScoreEl.textContent = '0'; hideModal(continueModal); gameContainer.style.display = 'flex'; if (!isMuted) { soundMusique.play().catch(e => {}); soundFoule.play().catch(e => {}); } initializeCashRegister(false); startNewClient(); return true; }
         saveHighScore = function(s) { if (s > highScores[currentDifficulty]) { highScores[currentDifficulty] = s; localStorage.setItem('cashier_high_scores', JSON.stringify(highScores)); } }
         loadHighScores = function() { const s = JSON.parse(localStorage.getItem('cashier_high_scores')); if (s) highScores = s; }
         
+        // --- Fonctions du Système de Rangs ---
+        updateRank = function(isNewGame = false) {
+            const newRank = RANKS.slice().reverse().find(r => cumulativeScore >= r.points);
+            if (newRank && (!currentRank || newRank.name !== currentRank.name)) {
+                currentRank = newRank;
+                if(!isNewGame) showRankUpModal(newRank); // N'affiche la promotion que si ce n'est pas le début d'une partie
+            } else if (!currentRank) {
+                currentRank = RANKS[0];
+            }
+        }
+        
+        showRankUpModal = function(newRank) {
+            newRankNameDisplay.textContent = newRank.name;
+            const nextRankIndex = RANKS.findIndex(r => r.name === newRank.name) + 1;
+            const nextRank = nextRankIndex < RANKS.length ? RANKS[nextRankIndex] : null;
+
+            if (nextRank) {
+                const pointsNeeded = nextRank.points - cumulativeScore;
+                pointsToNextRankDisplay.innerHTML = `Plus que <strong>${pointsNeeded.toLocaleString('fr-FR')}</strong> points pour atteindre le rang de <strong>${nextRank.name}</strong> !`;
+            } else {
+                pointsToNextRankDisplay.innerHTML = `<strong>Vous avez atteint le plus haut rang ! Félicitations !</strong>`;
+            }
+            showModal(rankUpModal);
+            playSound('sound-victoire');
+        }
+
+        showRankModal = function() {
+            if (isPaused) return; // Ne pas ouvrir si le jeu est déjà en pause par le menu principal
+            pauseGame();
+            hideModal(pauseModal); // La fonction pauseGame affiche la modale de pause, on la cache pour afficher la nôtre.
+            updateRank(true);
+
+            const nextRankIndex = RANKS.findIndex(r => r.name === currentRank.name) + 1;
+            const nextRank = nextRankIndex < RANKS.length ? RANKS[nextRankIndex] : null;
+
+            let progressHTML = `<p>Vous n'avez pas encore atteint le prochain rang.</p>`;
+            if (nextRank) {
+                const pointsNeeded = nextRank.points - cumulativeScore;
+                progressHTML = `<p id="rank-progress">Encore <strong>${pointsNeeded.toLocaleString('fr-FR')}</strong> points pour atteindre le rang <strong>${nextRank.name}</strong>.</p>`;
+            } else {
+                progressHTML = `<p id="rank-progress">Félicitations, vous avez atteint le rang le plus élevé !</p>`;
+            }
+
+            rankDialog.innerHTML = `<h2>Votre Progression</h2><p>Score Total : <strong>${cumulativeScore.toLocaleString('fr-FR')}</strong> points</p><p>Votre rang actuel est : <strong>${currentRank.name}</strong></p>${progressHTML}<hr><h3>Liste des Rangs</h3><ul class="rank-list">${RANKS.map(rank => `<li class="rank-item ${cumulativeScore >= rank.points ? 'achieved' : ''} ${currentRank.name === rank.name ? 'current' : ''}">${rank.name}<span class="rank-points">${rank.points.toLocaleString('fr-FR')} pts</span></li>`).join('')}</ul><button id="close-rank-modal-and-resume" style="margin-top: 20px;">Reprendre</button>`;
+            document.getElementById('close-rank-modal-and-resume').addEventListener('click', resumeGame);
+            showModal(rankModal);
+        }
+
         function attachEventListeners() {
             muteButton.addEventListener('click', toggleMute);
             soundOptionsButton.addEventListener('click', (e) => { e.stopPropagation(); soundOptionsPopup.classList.toggle('active'); });
@@ -715,7 +699,7 @@
             confirmCashInButton.addEventListener('click', confirmCashIn);
             cancelCashInButton.addEventListener('click', cancelCashIn);
             exactAmountButton.addEventListener('click', handleExactAmountClick);
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (largeBillModal.classList.contains('active')) hideModal(largeBillModal); else if (cashInModal.classList.contains('active')) cancelCashIn(); else if (soundOptionsPopup.classList.contains('active')) soundOptionsPopup.classList.remove('active'); else handlePauseToggle(); return; } if (document.activeElement === givenMoneyInput) { if (e.key === 'Enter') { e.preventDefault(); confirmCashInButton.click(); } return; } if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (difficultySelection.classList.contains('active')) startGame('normal'); else if (cashInModal.classList.contains('active')) confirmCashInButton.click(); else if (refillOverlay.classList.contains('active')) confirmRefillButton.click(); else if (summaryModal.classList.contains('active')) nextDaySameDifficultyButton.click(); else if (pauseModal.classList.contains('active')) resumeButton.click(); else if (largeBillModal.classList.contains('active')) { const b=largeBillButtonsContainer.querySelector('button'); if(b)b.click(); } else if (nextClientButton.style.display !== 'none') nextClientButton.click(); else if (validateButton.style.display !== 'none' && !validateButton.disabled) validateButton.click(); else if (cashInButton.style.display !== 'none') cashInButton.click(); else if (e.key === ' ') handlePauseToggle(); } });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (largeBillModal.classList.contains('active')) hideModal(largeBillModal); else if (rankUpModal.classList.contains('active')) hideModal(rankUpModal); else if (cashInModal.classList.contains('active')) cancelCashIn(); else if (rankModal.classList.contains('active')) resumeGame(); else if (soundOptionsPopup.classList.contains('active')) soundOptionsPopup.classList.remove('active'); else handlePauseToggle(); return; } if (document.activeElement === givenMoneyInput) { if (e.key === 'Enter') { e.preventDefault(); confirmCashInButton.click(); } return; } if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (difficultySelection.classList.contains('active')) startGame('normal'); else if(rankUpModal.classList.contains('active')) closeRankUpModalButton.click(); else if (cashInModal.classList.contains('active')) confirmCashInButton.click(); else if (refillOverlay.classList.contains('active')) confirmRefillButton.click(); else if (summaryModal.classList.contains('active')) nextDaySameDifficultyButton.click(); else if (pauseModal.classList.contains('active')) resumeButton.click(); else if (rankModal.classList.contains('active')) resumeGame(); else if (largeBillModal.classList.contains('active')) { const b=largeBillButtonsContainer.querySelector('button'); if(b)b.click(); } else if (nextClientButton.style.display !== 'none') nextClientButton.click(); else if (validateButton.style.display !== 'none' && !validateButton.disabled) validateButton.click(); else if (cashInButton.style.display !== 'none') cashInButton.click(); else if (e.key === ' ') handlePauseToggle(); } });
             validateButton.addEventListener('click', validateChange);
             changeDisplayLine.addEventListener('click', reEnterAmount);
             nextClientButton.addEventListener('click', startNewClient);
@@ -732,6 +716,8 @@
             difficultyButtons.addEventListener('mouseover', (e) => { if (e.target.tagName === 'BUTTON') { const d=e.target.dataset.difficulty; if(d)highscoreDisplay.textContent=highScores[d]||0; } });
             confirmContinueButton.addEventListener('click', loadGameState);
             declineContinueButton.addEventListener('click', () => { localStorage.removeItem('cashier_save_state'); hideModal(continueModal); showModal(difficultySelection); });
+            rankButton.addEventListener('click', showRankModal);
+            closeRankUpModalButton.addEventListener('click', () => hideModal(rankUpModal));
         }
     </script>
 </body>
