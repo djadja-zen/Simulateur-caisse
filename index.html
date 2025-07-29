@@ -492,6 +492,7 @@
         let dailyScore = 0, dailyTimeBonus = 0, dailyAccuracyBonus = 0, dailyErrorPenalty = 0, dailyOvertimePenalty = 0;
         let highScores = { easy: 0, normal: 0, hard: 0, extreme: 0 };
         let cumulativeScore = 0;
+        let justClearedCash = false; // NOUVEAU: Pour signaler qu'un dépôt vient d'être fait
         let currentRank = RANKS[0];
         
         // --- Fonctions Utilitaires ---
@@ -601,17 +602,31 @@
             currentDayEl.textContent = currentDay; 
             totalClientsDayEl.textContent = CLIENTS_PER_DAY; 
         }
+        
+        // MODIFIÉ: Logique de génération de montant
         generateAmountToPay=function(){
-            // Ajout d'une chance (environ 1/18) d'avoir un très gros montant
-            if (Math.random() < 0.055) {
+            // NOUVEAU: Logique pour forcer un montant plus petit après un dépôt
+            let forceSmallerAmount = justClearedCash;
+            if (justClearedCash) {
+                justClearedCash = false; // On réinitialise le drapeau immédiatement pour qu'il n'affecte qu'un seul client
+            }
+
+            // La chance d'avoir un très gros montant est annulée si on vient de vider la caisse
+            if (Math.random() < 0.055 && !forceSmallerAmount) {
                 const min = 800;
                 const max = 2000;
                 let hugeAmount = Math.random() * (max - min) + min;
                 return parseFloat(hugeAmount.toFixed(2));
             }
             
-            // Logique originale pour les montants standards
-            if(lastAmountToPay>0&&Math.random()<.15)return lastAmountToPay;
+            if(lastAmountToPay>0&&Math.random()<.15&&!forceSmallerAmount)return lastAmountToPay;
+
+            // Si on force un montant plus petit, on utilise une fourchette personnalisée
+            if (forceSmallerAmount) {
+                 let amount = Math.random() * (120 - 15) + 15; // Montant entre 15€ et 120€
+                 return parseFloat(amount.toFixed(2));
+            }
+
             const e=[{min:.5,max:10,weight:.4},{min:10.01,max:50,weight:.45},{min:50.01,max:150,weight:.12},{min:150.01,max:400,weight:.03}];
             let t=null,a=Math.random(),n=0;
             for(const l of e){if(n+=l.weight,a<n){t=l;break}}
@@ -619,6 +634,7 @@
             let r=Math.random()*(t.max-t.min)+t.min,o=Math.random();
             return o<.25?r=Math.floor(r)+[.99,.95][Math.floor(2*Math.random())]:o<.5&&(r=Math.floor(r)+[0,.5][Math.floor(2*Math.random())]),parseFloat(r.toFixed(2))
         }
+
         createSuperLargePayment=function(t,e){
             let a=[],n=0;
             const r=e.filter(c=>c.value>=100).sort((c,e)=>e.value-c.value); // On utilise des billets de 100, 200, 500
@@ -677,9 +693,80 @@
         handleExactAmountClick = function() { if (givenMoneyInput) { givenMoneyInput.value = currentAmountToPay.toFixed(2); confirmCashInButton.focus(); } }
         addReturnedMoney = function(value) { if (isPaused) return; const currency = CURRENCIES.find(c => c.value === value); if (!currency) return; if ((cashRegister[value] || 0) <= 0) { showMessage(`Vous n'avez plus de ${currency.label} en caisse !`, 'error'); return; } if(currency.type === 'bill') playSound('sound-billet'); else playSound('sound-piece'); cashRegister[value]--; actualCashTotal = parseFloat((actualCashTotal - value).toFixed(2)); returnedCurrencyList.push(value); currentReturnedMoney = parseFloat((currentReturnedMoney + value).toFixed(2)); updateReturnedMoneyDisplay(); updateCashDrawer(); }
         removeReturnedMoney = function(indexToRemove) { if (isPaused) return; if (indexToRemove === undefined || indexToRemove < 0 || indexToRemove >= returnedCurrencyList.length) return; const removedValue = returnedCurrencyList.splice(indexToRemove, 1)[0]; const currency = CURRENCIES.find(c => c.value === removedValue); if(currency.type === 'bill') playSound('sound-billet'); else playSound('sound-piece'); cashRegister[removedValue]++; actualCashTotal = parseFloat((actualCashTotal + removedValue).toFixed(2)); currentReturnedMoney = parseFloat((currentReturnedMoney - removedValue).toFixed(2)); updateReturnedMoneyDisplay(); updateCashDrawer(); }
+        
+        // NOUVEAU: Fonction pour simuler un dépôt bancaire et vider les grosses coupures
+        performEndOfDayBankDeposit = function() {
+            // On exécute cette fonction uniquement tous les 3 jours, à partir du jour 2.
+            if (currentDay > 1 && currentDay % 3 === 0) {
+
+                // Stocks cibles pour les billets. Les pièces ne sont pas affectées.
+                const targetStock = {
+                    '500': 0, 
+                    '200': 0,
+                    '100': 1, // On garde 1 billet de 100€
+                    '50': 3,
+                    '20': 4,
+                    '10': 8,
+                    '5': 10
+                };
+
+                let totalDeposited = 0;
+
+                // Itération sur les billets à vérifier
+                for (const valueStr in targetStock) {
+                    const value = parseFloat(valueStr);
+                    const currentStock = cashRegister[value] || 0;
+                    const target = targetStock[valueStr];
+
+                    if (currentStock > target) {
+                        const excessCount = currentStock - target;
+                        const valueRemoved = excessCount * value;
+                        
+                        totalDeposited += valueRemoved;
+                        cashRegister[value] = target; // On met à jour le stock dans la caisse
+                    }
+                }
+
+                // Si de l'argent a été enlevé, on met à jour les totaux pour éviter une erreur de caisse
+                if (totalDeposited > 0) {
+                    theoreticalCashTotal = parseFloat((theoreticalCashTotal - totalDeposited).toFixed(2));
+                    actualCashTotal = parseFloat((actualCashTotal - totalDeposited).toFixed(2));
+                    
+                    // On active le drapeau pour le client suivant
+                    justClearedCash = true; 
+                    
+                    // On informe le joueur
+                    showMessage(`Dépôt bancaire : ${formatCurrency(totalDeposited)} ont été retirés de la caisse.`, 'info', 6000);
+                    playSound('sound-billet'); // Joue un son pour notifier l'action
+                }
+            }
+        }
+
         validateChange = function() { stopTimer(); playSound('sound-caisse'); validateButton.disabled = true; changeDisplayLine.classList.remove('editable'); emergencyRefillButton.style.display = 'none'; let clientScore = SCORING.BASE_PER_CLIENT; let hasError = false; if (timeLeft > 0) { const timeBonus = timeLeft * SCORING.TIME_BONUS_MULTIPLIER; clientScore += timeBonus; dailyTimeBonus += timeBonus; } theoreticalCashTotal = parseFloat((theoreticalCashTotal + currentAmountToPay).toFixed(2)); if (Math.abs(userEnteredGivenMoney - clientGivenMoney) > 0.001) { hasError = true; clientScore -= SCORING.PENALTY_CASH_IN_ERROR; dailyErrorPenalty += SCORING.PENALTY_CASH_IN_ERROR; dailyErrors.push({type: 'encaissement', client: clientsServedToday, clientGave: clientGivenMoney, userEntered: userEnteredGivenMoney }); } if (Math.abs(currentReturnedMoney - correctChangeNeeded) > 0.001) { hasError = true; clientScore -= SCORING.PENALTY_CHANGE_ERROR; dailyErrorPenalty += SCORING.PENALTY_CHANGE_ERROR; dailyErrors.push({type: 'rendu', client: clientsServedToday, expected: correctChangeNeeded, returned: currentReturnedMoney, returnedItems: [...returnedCurrencyList]}); } if (!hasError) { clientScore += SCORING.ACCURACY_BONUS; dailyAccuracyBonus += SCORING.ACCURACY_BONUS; } clientScore *= SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty]; dailyScore += Math.round(clientScore); currentScoreEl.textContent = dailyScore; nextClientButton.style.display = 'inline-block'; pauseButton.disabled = true; }
         endOfDaySummary = function() { customerImage.style.opacity = '0'; setTimeout(() => { customerImage.style.display = 'none'; }, 500); soundFoule.pause(); const totalErrorPenalty = dailyErrorPenalty + dailyOvertimePenalty; const finalScore = dailyScore - dailyOvertimePenalty; cumulativeScore += finalScore; updateRank(); saveHighScore(finalScore); summaryBaseScoreEl.textContent = clientsServedToday * SCORING.BASE_PER_CLIENT; summaryTimeBonusEl.textContent = Math.round(dailyTimeBonus); summaryAccuracyBonusEl.textContent = dailyAccuracyBonus; summaryErrorPenaltyEl.textContent = -totalErrorPenalty; summaryFinalScoreEl.textContent = finalScore; if (dailyOvertimePenalty > 0) { dailyErrors.push({ type: 'temps_depasse', details: `Vous avez accumulé une pénalité de ${dailyOvertimePenalty} points pour temps dépassé.` }); } const actualCents = Math.round(actualCashTotal * 100); const theoreticalCents = Math.round(theoreticalCashTotal * 100); const difference = (actualCents - theoreticalCents) / 100; summaryDifference.textContent = formatCurrency(Math.abs(difference)); if (Math.abs(difference) < 0.001) { playSound('sound-victoire'); summaryDifference.classList.remove('error-message'); summaryDifference.classList.add('success-message'); summaryDifference.textContent += ' (Caisse juste !)'; } else { playSound('sound-echec'); summaryDifference.classList.remove('success-message'); summaryDifference.classList.add('error-message'); summaryDifference.textContent += difference > 0 ? ' (Excédent)' : ' (Manquant)'; dailyErrors.push({ type: 'difference_caisse', details: `La caisse présente un ${difference > 0 ? 'excédent' : 'manquant'} de ${formatCurrency(Math.abs(difference))}.` }); } errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3>'; if (dailyErrors.length > 0) { errorLogContainer.style.display = 'block'; dailyErrors.forEach(err => { const entry = document.createElement('div'); entry.className = 'error-entry'; if (err.type === 'encaissement') entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur d'encaissement</div><div class="error-details">Le client a donné <span>${formatCurrency(err.clientGave)}</span>, vous avez saisi <span>${formatCurrency(err.userEntered)}</span>.</div>`; else if (err.type === 'rendu') { const r = err.returnedItems.reduce((a,v)=>{a[v]=(a[v]||0)+1;return a},{}); const s=Object.entries(r).map(([v,c])=>`${c}x ${CURRENCIES.find(i=>i.value==v).label}`).join(', '); entry.innerHTML = `<div class="error-title">Client ${err.client} : Erreur de rendu</div><div class="error-details">Rendu attendu : <span>${formatCurrency(err.expected)}</span>. Vous avez rendu : <span>${formatCurrency(err.returned)}</span>.<br>Détail : ${s||'rien'}</div>`;} else if (err.type === 'temps_depasse') entry.innerHTML = `<div class="error-title">Pénalité de Temps</div><div class="error-details">${err.details}</div>`; else if (err.type === 'difference_caisse') entry.innerHTML = `<div class="error-title">Erreur de Caisse</div><div class="error-details">${err.details}</div>`; errorLogContainer.appendChild(entry); }); } else { errorLogContainer.innerHTML = '<h3>Journal des Erreurs :</h3><div class="error-entry">Aucune erreur, félicitations !</div>'; errorLogContainer.style.display = 'block'; } showModal(summaryModal); }
-        startNextDay = function() { hideModal(summaryModal); clientsServedToday = 0; dailyScore = 0; dailyTimeBonus = 0; dailyAccuracyBonus = 0; dailyErrorPenalty = 0; dailyOvertimePenalty = 0; currentScoreEl.textContent = '0'; currentDay++; theoreticalCashTotal = actualCashTotal; initializeCashRegister(false); saveGameState(); if (!isMuted) soundFoule.play().catch(e => {}); startNewClient(); }
+        
+        // MODIFIÉ: Appel à la fonction de dépôt
+        startNextDay = function() { 
+            hideModal(summaryModal); 
+            
+            // NOUVEAU: Appel à la fonction de dépôt avant de commencer la journée
+            performEndOfDayBankDeposit();
+
+            clientsServedToday = 0; 
+            dailyScore = 0; 
+            dailyTimeBonus = 0; 
+            dailyAccuracyBonus = 0; 
+            dailyErrorPenalty = 0; 
+            dailyOvertimePenalty = 0; 
+            currentScoreEl.textContent = '0'; 
+            currentDay++; 
+            theoreticalCashTotal = actualCashTotal; 
+            initializeCashRegister(false); 
+            saveGameState(); 
+            if (!isMuted) soundFoule.play().catch(e => {}); 
+            startNewClient(); 
+        }
+
         startTimer = function() { if (timerInterval) return; timerInterval = setInterval(() => { if (isPaused) return; timeLeft--; if (timeLeft < 0) { dailyOvertimePenalty += SCORING.PENALTY_OVERTIME_PER_SECOND; if (timeLeft === -1) { showMessage("Temps dépassé ! Chaque seconde ajoute une pénalité.", "info", 2500); playSound('sound-echec'); } } updateTimerDisplay(); }, 1000); }
         stopTimer = function() { clearInterval(timerInterval); timerInterval = null; }
         updateTimerDisplay = function() { const i = timeLeft < 0; const r = Math.abs(timeLeft); const m = Math.floor(r / 60); const s = r % 60; timerDisplay.textContent = `${i?'-':''}${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; timerDisplay.classList.toggle('low-time', timeLeft <= 10 && !i); }
@@ -778,4 +865,4 @@
         }
     </script>
 </body>
-</html>
+</html>```s
