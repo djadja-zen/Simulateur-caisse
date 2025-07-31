@@ -682,7 +682,20 @@
         createInsufficientPayment=function(t,e){let a=[];const n=e.filter(c=>c.value<t);return n.length>0?(a.push(n[Math.floor(Math.random()*n.length)]),Math.random()>.5&&n.length>1&&a.push(n[Math.floor(Math.random()*n.length)])):createStandardPayment(t,e),{currencies:a,amount:parseFloat(a.reduce((c,e)=>c+e.value,0).toFixed(2))}}
         createAllCoinsPayment=function(t,e){let a=[],n=0;const r=e.filter(c=>"coin"===c.type).sort((c,e)=>c.value-e.value);for(;n<t&&a.length<15&&r.length>0;){let c=r.pop();a.push(c),n=parseFloat((n+c.value).toFixed(2))}return n<t?createStandardPayment(t,e):{currencies:a,amount:n}}
         createAlmostExactPayment=function(t,e){let a=createExactPayment(t,e);if(a.amount!==t||a.currencies.length<2)return createStandardPayment(t,e);const n=Math.floor(Math.random()*a.currencies.length),r=a.currencies[n],o=e.filter(c=>c.type===r.type&&Math.abs(c.value-r.value)>.001&&Math.abs(c.value-r.value)<.5);return o.length>0?a.currencies[n]=o[Math.floor(Math.random()*o.length)]:createStandardPayment(t,e),{currencies:a.currencies,amount:parseFloat(a.currencies.reduce((c,e)=>c+e.value,0).toFixed(2))}}
-        createLargeBillPayment=function(t,e){const a=e.filter(c=>c.value>=20&&c.value>3*t);return a.length>0?{currencies:[a[Math.floor(Math.random()*a.length)]],amount:a[Math.floor(Math.random()*a.length)].value}:createStandardPayment(t,e)}
+        
+        // --- BUG CORRIGÉ ICI ---
+        createLargeBillPayment=function(t,e){
+            const a=e.filter(c=>c.value>=20&&c.value>3*t);
+            if (a.length > 0) {
+                // On choisit le billet UNE SEULE FOIS et on le stocke dans une variable
+                const chosenBill = a[Math.floor(Math.random() * a.length)];
+                // On utilise ce même billet pour l'affichage (currencies) ET la valeur (amount)
+                return { currencies: [chosenBill], amount: chosenBill.value };
+            } else {
+                return createStandardPayment(t, e);
+            }
+        }
+        
         displayClientPayment=function(c){ clientPaymentDisplay.innerHTML=""; let e=[...c.currencies]; const disorderChance = Math.min(0.33 + (currentDay - 1) * 0.05, 0.9); if(Math.random() < disorderChance) { e.sort(()=>.5-Math.random()); } else { e.sort((c,e)=>e.value-c.value); } e.forEach(c=>{const e=document.createElement("img");e.src=c.img,e.alt=c.label,e.className=`currency-img ${c.type}`,clientPaymentDisplay.appendChild(e)}),clientGivenMoney=c.amount }
         startNewClient=function(){ if(clientsServedToday>=CLIENTS_PER_DAY){stopTimer(),endOfDaySummary();return} resetForNextClient(),clientsServedToday++,currentClientEl.textContent=clientsServedToday,setTimeout(()=>{const c=Math.floor(12*Math.random())+1;customerImage.src=`images/client-${c}.png`,customerImage.style.display="block",setTimeout(()=>{customerImage.style.opacity="1"},50)},600); const c=generateAmountToPay(),e=c===lastAmountToPay;lastAmountToPay=c,currentAmountToPay=c,amountToPayEl.textContent=formatCurrency(currentAmountToPay); const t=generateClientPayment(currentAmountToPay,{forceDifferent:e});lastPaymentType=t.type,displayClientPayment(t),updateCashDrawer(),checkRefillNecessity(); const baseTime = DIFFICULTY_SETTINGS[currentDifficulty].time; const timeReduction = Math.floor((currentDay - 1) * 0.5); timeLeft = Math.max(baseTime - timeReduction, 15); startTimer() }
         handleInsufficientPayment=function(){if(clientGivenMoney>=currentAmountToPay){showMessage("Erreur de jugement. Le paiement du client est suffisant.","info");return}const c=SCORING.VIGILANCE_BONUS*SCORING.DIFFICULTY_MULTIPLIER[currentDifficulty];dailyScore+=c,dailyAccuracyBonus+=c,currentScoreEl.textContent=dailyScore,showMessage("Bien vu ! Le client s'excuse et corrige son paiement.","success",4e3),playSound("sound-piece");const e=generateClientPayment(currentAmountToPay,{forceSufficient:!0});displayClientPayment(e)}
@@ -865,4 +878,4 @@
         }
     </script>
 </body>
-</html>```s
+</html>
